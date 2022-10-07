@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8B255A5528F0509F0059D085 /* CacheFeedUseCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B255A5428F0509F0059D085 /* CacheFeedUseCaseTests.swift */; };
 		8B438EA528E4E36100862D62 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B438EA428E4E36100862D62 /* HTTPClient.swift */; };
 		8B438EA728E4E3D900862D62 /* FeedItemsMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B438EA628E4E3D900862D62 /* FeedItemsMapper.swift */; };
 		8B438EAA28E5C27C00862D62 /* URLSessionHTTPClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B438EA928E5C27C00862D62 /* URLSessionHTTPClientTests.swift */; };
@@ -42,6 +43,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8B255A5428F0509F0059D085 /* CacheFeedUseCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheFeedUseCaseTests.swift; sourceTree = "<group>"; };
 		8B438EA428E4E36100862D62 /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
 		8B438EA628E4E3D900862D62 /* FeedItemsMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedItemsMapper.swift; sourceTree = "<group>"; };
 		8B438EA928E5C27C00862D62 /* URLSessionHTTPClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionHTTPClientTests.swift; sourceTree = "<group>"; };
@@ -86,6 +88,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8B255A5328F050700059D085 /* Feed Cache */ = {
+			isa = PBXGroup;
+			children = (
+				8B255A5428F0509F0059D085 /* CacheFeedUseCaseTests.swift */,
+			);
+			path = "Feed Cache";
+			sourceTree = "<group>";
+		};
 		8B438EA828E4ECFA00862D62 /* Feed API */ = {
 			isa = PBXGroup;
 			children = (
@@ -155,6 +165,7 @@
 		8BF89B7828E32B570017307F /* EssentialFeedTests */ = {
 			isa = PBXGroup;
 			children = (
+				8B255A5328F050700059D085 /* Feed Cache */,
 				8B438EA828E4ECFA00862D62 /* Feed API */,
 			);
 			path = EssentialFeedTests;
@@ -334,6 +345,7 @@
 			files = (
 				8BF89B8428E32CF40017307F /* RemoteFeedLoaderTests.swift in Sources */,
 				8B438EAA28E5C27C00862D62 /* URLSessionHTTPClientTests.swift in Sources */,
+				8B255A5528F0509F0059D085 /* CacheFeedUseCaseTests.swift in Sources */,
 				8B438EAD28E701B900862D62 /* XCTestCase+MemoryLeakTracking.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

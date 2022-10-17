@@ -1,5 +1,5 @@
 //
-//  LocalFeedloader.swift
+//  LocalFeedLoader.swift
 //  EssentialFeed
 //
 //  Created by Aleksandr Kornjushko on 10.10.2022.
@@ -28,6 +28,10 @@ public final class LocalFeedLoader {
         self.cache(feed, with: completion)
       }
     }
+  }
+
+  public func load() {
+    store.retrieve()
   }
 
   private func cache(_ feed: [FeedImage], with completion: @escaping (SaveResult) -> Void) {

@@ -7,10 +7,7 @@
 
 import Foundation
 
-public enum FeedLoadResult {
-  case success([FeedImage])
-  case failure(Error)
-}
+public typealias FeedLoadResult = Result<[FeedImage], Error>
 
 public protocol FeedLoader {
   func load(completion: @escaping (FeedLoadResult) -> Void)

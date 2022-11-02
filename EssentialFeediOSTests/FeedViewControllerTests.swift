@@ -70,6 +70,15 @@ final class FeedViewControllerTests: XCTestCase {
     XCTAssertTrue(sut.isShowingLoadingIndicator)
   }
 
+  func test_viewDidLoad_hidesLoadingIndicatorOnLoaderCompletion() {
+    let (sut, loader) = makeSUT()
+
+    sut.loadViewIfNeeded()
+    loader.completeFeedLoading()
+
+    XCTAssertFalse(sut.isShowingLoadingIndicator)
+  }
+
   func test_userInitiatedFeedReload_hidesLoadingIndicatorOnLoaderCompletion() {
     let (sut, loader) = makeSUT()
 

@@ -125,6 +125,7 @@ Location</string>
                     </tableView>
                     <navigationItem key="navigationItem" title="My Feed" id="9Av-yf-wFz"/>
                     <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="deU-j4-CZt">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <connections>
                             <action selector="refresh" destination="VvT-ZJ-eqo" eventType="valueChanged" id="m9q-7w-7Mf"/>

@@ -15,7 +15,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <view key="tableHeaderView" contentMode="scaleToFill" id="ztE-DG-RxF">
+                        <view key="tableHeaderView" contentMode="scaleToFill" id="ztE-DG-RxF" customClass="ErrorView" customModule="EssentialFeediOS">
                             <rect key="frame" x="0.0" y="0.0" width="390" height="16"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -148,6 +148,9 @@ Location</string>
                             <action selector="refresh" destination="YZv-Rk-wXi" eventType="valueChanged" id="bmM-un-EUz"/>
                         </connections>
                     </refreshControl>
+                    <connections>
+                        <outlet property="errorView" destination="ztE-DG-RxF" id="I8T-v0-BQ2"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="i1F-IY-Ew9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

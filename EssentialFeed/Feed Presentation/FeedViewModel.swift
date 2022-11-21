@@ -8,5 +8,5 @@
 import Foundation
 
 public struct FeedViewModel {
-  public var feed: [FeedImage]
+  public let feed: [FeedImage]
 }

@@ -91,8 +91,8 @@ class LoadFeedFromRemoteUseCaseTests: XCTestCase {
     expect(sut, toCompleteWith: .success(items), when: {
       let json = makeItemsJSON([item1.json, item2.json])
       client.complete(withStatusCode: 200, data: json)
-  })
-}
+    })
+  }
 
   func test_load_doesNotDeliverResultAfterSUTInstanceHasBeenDeallocated() {
     let url = URL(string: "https://any-url.com")!
@@ -169,35 +169,5 @@ class LoadFeedFromRemoteUseCaseTests: XCTestCase {
     action()
 
     wait(for: [exp], timeout: 1.0)
-  }
-
-  private class HTTPClientSpy: HTTPClient {
-    private struct Task: HTTPClientTask {
-      func cancel() {}
-    }
-
-    private var messages = [(url: URL, completion: (HTTPClient.Result) -> Void)]()
-
-    var requestedURLs: [URL] {
-      return messages.map { $0.url }
-    }
-
-    func get(from url: URL, completion: @escaping (HTTPClient.Result) -> Void) -> HTTPClientTask {
-      messages.append((url, completion))
-      return Task()
-    }
-
-    func complete(with error: Error, at index: Int = 0) {
-      messages[index].completion(.failure(error))
-    }
-
-    func complete(withStatusCode code: Int, data: Data, at index: Int = 0) {
-      let response = HTTPURLResponse(url: requestedURLs[index],
-                                     statusCode: code,
-                                     httpVersion: nil,
-                                     headerFields: nil)!
-
-      messages[index].completion(.success((data, response)))
-    }
   }
 }

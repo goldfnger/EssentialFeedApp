@@ -90,6 +90,14 @@ final class ValidateFeedCacheUseCaseTests: XCTestCase {
     })
   }
 
+  func test_validateCache_succeedsOnEmptyCache() {
+    let (sut, store) = makeSUT()
+
+    expect(sut, toCompleteWith: .success(()), when: {
+      store.completeRetrievalWithEmptyCache()
+    })
+  }
+
   func test_validateCache_doesNotDeleteInvalidCacheAfterSUTInstanceHasBeenDeallocated() {
     let store = FeedStoreSpy()
     var sut: LocalFeedLoader? = LocalFeedLoader(store: store, currentDate: Date.init)
@@ -116,22 +124,22 @@ final class ValidateFeedCacheUseCaseTests: XCTestCase {
 
   private func expect(_ sut: LocalFeedLoader, toCompleteWith expectedResult: LocalFeedLoader.ValidationResult, when action: () -> Void, file: StaticString = #file, line: UInt = #line) {
     let exp = expectation(description: "Wait for load completion")
-    
+
     sut.validateCache { receivedResult in
       switch (receivedResult, expectedResult) {
       case (.success, .success):
         break
-        
+
       case let (.failure(receivedError as NSError), .failure(expectedError as NSError)):
         XCTAssertEqual(receivedError, expectedError, file: file, line: line)
-        
+
       default:
         XCTFail("Expected result \(expectedResult), got \(receivedResult) instead", file: file, line: line)
       }
-      
+
       exp.fulfill()
     }
-    
+
     action()
     wait(for: [exp], timeout: 1.0)
   }

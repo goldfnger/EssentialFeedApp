@@ -590,9 +590,9 @@
 		8BF89B6428E3291C0017307F /* EssentialFeed */ = {
 			isa = PBXGroup;
 			children = (
-				8B255A5628F4323A0059D085 /* Feed Cache */,
 				8BF89B7228E32B030017307F /* FeedFeature */,
 				8BF89B8528E42BD30017307F /* Feed API */,
+				8B255A5628F4323A0059D085 /* Feed Cache */,
 				8BBB5360292BA8F9007B85B2 /* Feed Presentation */,
 				8BF89B6528E3291C0017307F /* EssentialFeed.h */,
 				8BF89B6628E3291C0017307F /* EssentialFeed.docc */,

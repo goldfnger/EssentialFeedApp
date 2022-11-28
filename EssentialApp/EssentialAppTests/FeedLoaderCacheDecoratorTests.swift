@@ -7,29 +7,7 @@
 
 import XCTest
 import EssentialFeed
-
-// FeedLoaderCacheDecorator is a FeedLoader
-final class FeedLoaderCacheDecorator: FeedLoader {
-  private let decoratee: FeedLoader
-  private let cache: FeedCache
-
-  // instantiate another loader which is the decoratee - the loader we are decorating. Step by step we inject save operation to it.
-  init(decoratee: FeedLoader, cache: FeedCache) {
-    self.decoratee = decoratee
-    self.cache = cache
-  }
-
-  func load(completion: @escaping (FeedLoader.Result) -> Void) {
-    // we need to forward message to the decoratee
-    decoratee.load { [weak self] result in
-      // map will be executed only in success case
-      completion(result.map { feed in
-        self?.cache.save(feed) { _ in }
-        return feed
-      })
-    }
-  }
-}
+import EssentialApp
 
 final class FeedLoaderCacheDecoratorTests: XCTestCase, FeedLoaderTestCase {
 

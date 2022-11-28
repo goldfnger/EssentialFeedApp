@@ -23,9 +23,16 @@ public final class FeedLoaderCacheDecorator: FeedLoader {
     decoratee.load { [weak self] result in
       // map will be executed only in success case
       completion(result.map { feed in
-        self?.cache.save(feed) { _ in }
+        self?.cache.saveIgnoringResult(feed)
         return feed
       })
     }
+  }
+}
+
+private extension FeedCache {
+  // we dont care about result
+  func saveIgnoringResult(_ feed: [FeedImage]) {
+    save(feed) { _ in }
   }
 }

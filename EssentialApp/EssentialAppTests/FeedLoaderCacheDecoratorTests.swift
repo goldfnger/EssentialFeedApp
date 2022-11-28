@@ -29,10 +29,11 @@ final class FeedLoaderCacheDecorator: FeedLoader {
   func load(completion: @escaping (FeedLoader.Result) -> Void) {
     // we need to forward message to the decoratee
     decoratee.load { [weak self] result in
-      if let feed = try? result.get() {
+      // map will be executed only in success case
+      completion(result.map { feed in
         self?.cache.save(feed) { _ in }
-      }
-      completion(result)
+        return feed
+      })
     }
   }
 }

@@ -9,12 +9,6 @@ import XCTest
 import EssentialFeed
 import EssentialApp
 
-protocol FeedImageDataCache {
-   typealias Result = Swift.Result<Void, Error>
-
-   func save(_ data: Data, for url: URL, completion: @escaping (Result) -> Void)
- }
-
 class FeedImageDataLoaderCacheDecorator: FeedImageDataLoader {
   private let decoratee: FeedImageDataLoader
   private let cache: FeedImageDataCache
@@ -26,7 +20,6 @@ class FeedImageDataLoaderCacheDecorator: FeedImageDataLoader {
 
   func loadImageData(from url: URL, completion: @escaping (FeedImageDataLoader.Result) -> Void) -> FeedImageDataLoaderTask {
     return decoratee.loadImageData(from: url) { [weak self] result in
-      self?.cache.save((try? result.get()) ?? Data(), for: url) { _ in }
       completion(result.map { data in
         self?.cache.save(data, for: url) { _ in }
         return data

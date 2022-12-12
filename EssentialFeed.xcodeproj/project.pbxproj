@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8B0C3EA4293A45F90098AFC1 /* FeedSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0C3EA3293A45F90098AFC1 /* FeedSnapshotTests.swift */; };
 		8B255A5528F0509F0059D085 /* CacheFeedUseCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B255A5428F0509F0059D085 /* CacheFeedUseCaseTests.swift */; };
 		8B255A5828F4324E0059D085 /* LocalFeedLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B255A5728F4324E0059D085 /* LocalFeedLoader.swift */; };
 		8B255A5A28F432E30059D085 /* FeedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B255A5928F432E30059D085 /* FeedStore.swift */; };
@@ -144,6 +145,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8B0C3EA3293A45F90098AFC1 /* FeedSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedSnapshotTests.swift; sourceTree = "<group>"; };
 		8B255A5428F0509F0059D085 /* CacheFeedUseCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheFeedUseCaseTests.swift; sourceTree = "<group>"; };
 		8B255A5728F4324E0059D085 /* LocalFeedLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalFeedLoader.swift; sourceTree = "<group>"; };
 		8B255A5928F432E30059D085 /* FeedStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedStore.swift; sourceTree = "<group>"; };
@@ -365,13 +367,6 @@
 			path = "Feed UI";
 			sourceTree = "<group>";
 		};
-		8B4AAADF291538B200481073 /* Feed Image Loader */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = "Feed Image Loader";
-			sourceTree = "<group>";
-		};
 		8B83E9C32927B5D600B11520 /* Feed Presentation */ = {
 			isa = PBXGroup;
 			children = (
@@ -479,7 +474,6 @@
 		8BF5A08E291155D500CBBDA2 /* EssentialFeediOS */ = {
 			isa = PBXGroup;
 			children = (
-				8B4AAADF291538B200481073 /* Feed Image Loader */,
 				8B4AAADD291537A200481073 /* Feed UI */,
 			);
 			path = EssentialFeediOS;
@@ -488,6 +482,7 @@
 		8BF5A098291155D600CBBDA2 /* EssentialFeediOSTests */ = {
 			isa = PBXGroup;
 			children = (
+				8B0C3EA3293A45F90098AFC1 /* FeedSnapshotTests.swift */,
 			);
 			path = EssentialFeediOSTests;
 			sourceTree = "<group>";
@@ -861,6 +856,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8BF9663C29117C0100A604E4 /* XCTestCase+MemoryLeakTracking.swift in Sources */,
+				8B0C3EA4293A45F90098AFC1 /* FeedSnapshotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

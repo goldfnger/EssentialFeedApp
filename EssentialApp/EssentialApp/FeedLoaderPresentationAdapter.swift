@@ -5,29 +5,39 @@
 //  Created by Aleksandr Kornjushko on 14.11.2022.
 //
 
+import Combine
 import EssentialFeed
 import EssentialFeediOS
 
 final class FeedLoaderPresentationAdapter: FeedViewControllerDelegate {
-  private let feedLoader: FeedLoader
+  private let feedLoader: () -> FeedLoader.Publisher
+  private var cancellable: Cancellable?
   var presenter: FeedPresenter?
 
-  init(feedLoader: FeedLoader) {
+  init(feedLoader: @escaping() -> FeedLoader.Publisher) {
     self.feedLoader = feedLoader
   }
 
   func didRequestFeedRefresh() {
     presenter?.didStartLoadingFeed()
 
-    feedLoader.load { [weak self] result in
-      switch result {
-      case let .success(feed):
-        self?.presenter?.didFinishLoadingFeed(with: feed)
+    // sink is used to subscribe to the 'Publisher' and start the operation.
+    // we need to hold(cancellable = ...) the result of the subscription which is 'Cancellable'. if we dont hold the Cancellable it will be deallocated, if it will be deallocated then it cancels the whole subscription.
+    cancellable = feedLoader().sink(
+      receiveCompletion: { [weak self] completion in
+        // if publisher completes
+      switch completion {
+        // we do nothing
+      case .finished: break
 
+        // if error occures
       case let .failure(error):
         self?.presenter?.didFinishLoadingFeed(with: error)
       }
-    }
+      // success value
+    }, receiveValue: { [weak self] feed in
+      self?.presenter?.didFinishLoadingFeed(with: feed)
+    })
   }
 }
 

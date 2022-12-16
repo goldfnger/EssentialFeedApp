@@ -378,11 +378,27 @@
 			path = "Shared API Infra";
 			sourceTree = "<group>";
 		};
+		8B2DE962294C92A0007B1811 /* Image Comments API */ = {
+			isa = PBXGroup;
+			children = (
+				8B2DE956294C841A007B1811 /* RemoteImageCommentsLoader.swift */,
+				8B2DE958294C84D2007B1811 /* ImageCommentsMapper.swift */,
+			);
+			path = "Image Comments API";
+			sourceTree = "<group>";
+		};
+		8B2DE963294C92D0007B1811 /* Image Comments API */ = {
+			isa = PBXGroup;
+			children = (
+				8B2DE954294C830E007B1811 /* LoadImageCommentsFromRemoteUseCaseTests.swift */,
+			);
+			path = "Image Comments API";
+			sourceTree = "<group>";
+		};
 		8B438EA828E4ECFA00862D62 /* Feed API */ = {
 			isa = PBXGroup;
 			children = (
 				8BF89B8328E32CF40017307F /* LoadFeedFromRemoteUseCaseTests.swift */,
-				8B2DE954294C830E007B1811 /* LoadImageCommentsFromRemoteUseCaseTests.swift */,
 				8BBB5377292D1974007B85B2 /* RemoteFeedImageDataLoaderTests.swift */,
 			);
 			path = "Feed API";
@@ -589,6 +605,7 @@
 				8B2DE95D294C9113007B1811 /* Shared API */,
 				8B2DE95E294C9131007B1811 /* Shared API Infra */,
 				8B2DE95A294C8AA1007B1811 /* Image Comments Feature */,
+				8B2DE962294C92A0007B1811 /* Image Comments API */,
 				8BF89B7228E32B030017307F /* FeedFeature */,
 				8BF89B8528E42BD30017307F /* Feed API */,
 				8B255A5628F4323A0059D085 /* Feed Cache */,
@@ -618,6 +635,7 @@
 				8B255A5328F050700059D085 /* Feed Cache */,
 				8B2DE95F294C9158007B1811 /* Shared API */,
 				8B2DE961294C9185007B1811 /* Shared API Infra */,
+				8B2DE963294C92D0007B1811 /* Image Comments API */,
 				8B438EA828E4ECFA00862D62 /* Feed API */,
 				8B83E9C32927B5D600B11520 /* Feed Presentation */,
 			);
@@ -631,8 +649,6 @@
 				8BF89B8628E42C060017307F /* RemoteFeedLoader.swift */,
 				8B438EA628E4E3D900862D62 /* FeedItemsMapper.swift */,
 				8B255A5B28F45F330059D085 /* RemoteFeedItem.swift */,
-				8B2DE956294C841A007B1811 /* RemoteImageCommentsLoader.swift */,
-				8B2DE958294C84D2007B1811 /* ImageCommentsMapper.swift */,
 				8BBB537C292E3EC9007B85B2 /* RemoteFeedImageDataLoader.swift */,
 			);
 			path = "Feed API";

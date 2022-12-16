@@ -173,7 +173,8 @@ final class LoadImageCommentsFromRemoteUseCaseTests: XCTestCase {
     sut.load { receivedResult in
       switch (receivedResult, expectedResult) {
       case let (.success(receivedItems), .success(expectedItems)):
-        XCTAssertEqual(receivedItems, expectedItems, file: file, line: line)
+        XCTAssertEqual(receivedItems, expectedItems,
+                       file: file, line: line)
 
       case let (.failure(receivedError as RemoteImageCommentsLoader.Error), .failure(expectedError as RemoteImageCommentsLoader.Error)):
         XCTAssertEqual(receivedError, expectedError, file: file, line: line)

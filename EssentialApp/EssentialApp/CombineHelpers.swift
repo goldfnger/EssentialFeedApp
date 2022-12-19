@@ -9,6 +9,26 @@ import Foundation
 import Combine
 import EssentialFeed
 
+
+public extension HTTPClient {
+  typealias Publisher = AnyPublisher<(Data, HTTPURLResponse), Error>
+
+  func getPublisher(url: URL) -> Publisher {
+    var task: HTTPClientTask?
+
+    return Deferred {
+      Future { completion in
+        // hold reference to task
+        task = self.get(from: url, completion: completion)
+      }
+    }
+    // and if we receive a cancel event - we cancel the task
+    // we are using '.handleEvents' to inject a side-effect into the chain (here side-effect if there is a cancel event - cancel the running task)
+    .handleEvents(receiveCancel: { task?.cancel() })
+    .eraseToAnyPublisher()
+  }
+}
+
 public extension FeedImageDataLoader {
   typealias Publisher = AnyPublisher<Data, Error>
 

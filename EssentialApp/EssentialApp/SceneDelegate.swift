@@ -60,15 +60,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     localFeedLoader.validateCache { _ in }
   }
 
-  private func makeRemoteFeedLoaderWithLocalFallBack() -> FeedLoader.Publisher {
+  private func makeRemoteFeedLoaderWithLocalFallBack() -> AnyPublisher<[FeedImage], Error> {
     // wrapping the load function into Combine
     // [ side-effect ]
     return httpClient
-      .getPublisher(url: remoteURL)
+      .getPublisher(url: remoteURL) // [ network request ]
     // -pure function-
-      .tryMap(FeedItemsMapper.map)
+      .tryMap(FeedItemsMapper.map)  // -     mapping     -
     // [ side-effect ]
-      .caching(to: localFeedLoader)
+      .caching(to: localFeedLoader) // [     caching     ]
       .fallback(to: localFeedLoader.loadPublisher)
   }
 

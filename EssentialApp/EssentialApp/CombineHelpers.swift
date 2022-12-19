@@ -63,7 +63,7 @@ private extension FeedImageDataCache {
   }
 }
 
-public extension FeedLoader {
+public extension LocalFeedLoader {
   // Future will be fired instantly once the 'makeRemoteFeedLoaderWithLocalFallBack' is called
   // if we want to fire request only when someone subscribes to it, not on creation of the Publisher, so one way we can defer the execution of the Future is to wrap it into a 'Deferred' publisher
 //    return Deferred {

@@ -1,25 +1,13 @@
 //
-//  FeedPresenter.swift
+//  LoadResourcePresenter.swift
 //  EssentialFeed
 //
-//  Created by Aleksandr Kornjushko on 21.11.2022.
+//  Created by Aleksandr Kornjushko on 19.12.2022.
 //
 
 import Foundation
 
-public protocol FeedView {
-  func display(_ viewModel: FeedViewModel)
-}
-
-public protocol FeedLoadingView {
-  func display(_ viewModel: FeedLoadingViewModel)
-}
-
-public protocol FeedErrorView {
-  func display(_ viewModel: FeedErrorViewModel)
-}
-
-public final class FeedPresenter {
+public final class LoadResourcePresenter {
   private let feedView: FeedView
   private let loadingView: FeedLoadingView
   private let errorView: FeedErrorView
@@ -55,7 +43,7 @@ public final class FeedPresenter {
   // [FeedImage] -> creates view models -> sends to the UI
   // [ImageComment] -> creates view models -> sends to the UI
   // Data -> UIImage -> send to the UI
-  
+
   // Resource -> create ResourceViewModel -> sends to the UI
   public func didFinishLoadingFeed(with feed: [FeedImage]) {
     feedView.display(FeedViewModel(feed: feed))
@@ -67,4 +55,5 @@ public final class FeedPresenter {
     errorView.display(.error(message: feedLoadError))
     loadingView.display(FeedLoadingViewModel(isLoading: false))
   }
+
 }

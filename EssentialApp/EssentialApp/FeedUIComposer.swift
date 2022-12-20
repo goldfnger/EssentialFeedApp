@@ -17,8 +17,10 @@ public final class FeedUIComposer {
     feedLoader: @escaping() -> AnyPublisher<[FeedImage], Error>,
     imageLoader: @escaping (URL) -> FeedImageDataLoader.Publisher
   ) -> FeedViewController {
-    let presentationAdapter = FeedLoaderPresentationAdapter(
-      feedLoader: feedLoader)
+    // when we loading the feed using generic:
+    // Resource = [FeedImage] and the View = FeedViewAdapter
+    // we moved type definition to the one level above which makes LoadResourcePresentationAdapter generic over the Resource and the ResourceView
+    let presentationAdapter = LoadResourcePresentationAdapter<[FeedImage], FeedViewAdapter>(loader: feedLoader)
 
     let feedController = makeFeedViewController(
       delegate: presentationAdapter,

@@ -9,22 +9,24 @@ import Combine
 import EssentialFeed
 import EssentialFeediOS
 
-final class FeedLoaderPresentationAdapter: FeedViewControllerDelegate {
-  private let feedLoader: () -> AnyPublisher<[FeedImage], Error>
+final class LoadResourcePresentationAdapter<Resource, View: ResourceView> {
+  private let loader: () -> AnyPublisher<Resource, Error>
   private var cancellable: Cancellable?
   // generic presenter should match the Resource type array of FeedImage and view type is FeedViewAdapter(which holds logic of view to display feed)
-  var presenter: LoadResourcePresenter<[FeedImage], FeedViewAdapter>?
+  // refactored to generic type so as FeedImage now we have Resource type and for view now we have generic ResourceView
+  var presenter: LoadResourcePresenter<Resource, View>?
 
-  init(feedLoader: @escaping() -> AnyPublisher<[FeedImage], Error>) {
-    self.feedLoader = feedLoader
+  init(loader: @escaping() -> AnyPublisher<Resource, Error>) {
+    self.loader = loader
   }
 
-  func didRequestFeedRefresh() {
+  // this generic func now can be used for loading images, comments feed or whatever we need in the future
+  func loadResource() {
     presenter?.didStartLoading()
 
     // sink is used to subscribe to the 'Publisher' and start the operation.
     // we need to hold(cancellable = ...) the result of the subscription which is 'Cancellable'. if we dont hold the Cancellable it will be deallocated, if it will be deallocated then it cancels the whole subscription.
-    cancellable = feedLoader()
+    cancellable = loader()
       .dispatchOnMainQueue()
       .sink(
         receiveCompletion: { [weak self] completion in
@@ -38,9 +40,15 @@ final class FeedLoaderPresentationAdapter: FeedViewControllerDelegate {
             self?.presenter?.didFinishLoading(with: error)
           }
           // success value
-        }, receiveValue: { [weak self] feed in
-          self?.presenter?.didFinishLoading(with: feed)
+        }, receiveValue: { [weak self] resource in
+          self?.presenter?.didFinishLoading(with: resource)
         })
   }
 }
 
+extension LoadResourcePresentationAdapter: FeedViewControllerDelegate {
+  // every-time "FeedViewController" requests to load the feed through its delegate we just call "loadResource"
+  func didRequestFeedRefresh() {
+    loadResource()
+  }
+}

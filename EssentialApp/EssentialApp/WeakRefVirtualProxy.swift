@@ -29,8 +29,9 @@ extension WeakRefVirtualProxy: ResourceLoadingView where T: ResourceLoadingView 
   }
 }
 
-extension WeakRefVirtualProxy: FeedImageView where T: FeedImageView, T.Image == UIImage {
-  func display(_ model: FeedImageViewModel<UIImage>) {
+// replace 'FeedImageView' with a generic 'ResourceView' and set 'ResourceViewModel' to UIImage. When we are presenting the image data the view model is a UIImage that will be converted from data
+extension WeakRefVirtualProxy: ResourceView where T: ResourceView, T.ResourceViewModel == UIImage {
+  func display(_ model: UIImage) {
     object?.display(model)
   }
 }

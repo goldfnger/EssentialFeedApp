@@ -34,14 +34,21 @@ public final class ImageCommentsPresenter {
   }
 
   // transform data from ImageComment type to ImageCommentsViewModel with mapped date or any requested data
+  // we are injecting the environment dependencies/the impure dependencies so we can control them during tests or even in production when we want to control the time
   public static func map(
-    _ comments: [ImageComment]) -> ImageCommentsViewModel {
+    _ comments: [ImageComment],
+    currentDate: Date = Date(),
+    calendar: Calendar = .current,
+    locale: Locale = .current
+  ) -> ImageCommentsViewModel {
     let formatter = RelativeDateTimeFormatter()
+    formatter.calendar = calendar
+    formatter.locale = locale
 
     return ImageCommentsViewModel(comments: comments.map { comment in
       ImageCommentViewModel(
         message: comment.message,
-        date: formatter.localizedString(for: comment.createdAt, relativeTo: Date()),
+        date: formatter.localizedString(for: comment.createdAt, relativeTo: currentDate),
         username: comment.username)
     })
   }

@@ -30,7 +30,12 @@ final class ImageCommentsPresenterTests: XCTestCase {
                    username: "another username")
     ]
 
-    let viewModel = ImageCommentsPresenter.map(comments)
+    let viewModel = ImageCommentsPresenter.map(
+      comments,
+      currentDate: now,
+      calendar: calendar,
+      locale: locale
+    )
 
     XCTAssertEqual(viewModel.comments, [
       ImageCommentViewModel(

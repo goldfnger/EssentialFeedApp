@@ -28,7 +28,7 @@ final class FeedViewAdapter: ResourceView {
       // because model is already immutable we can pass here the view model at construction time (things that dont change can be passed at initialization time) (things that change overtime you pass either through property or method injection)
       // adapter implements the cell controller delegate to run the generic load resource logic
       let view = FeedImageCellController(
-        viewModel: FeedImagePresenter<FeedImageCellController, UIImage>.map(model),
+        viewModel: FeedImagePresenter.map(model),
         delegate: adapter)
 
       adapter.presenter = LoadResourcePresenter(

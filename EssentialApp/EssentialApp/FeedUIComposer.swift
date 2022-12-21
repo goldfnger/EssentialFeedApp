@@ -16,7 +16,7 @@ public final class FeedUIComposer {
   public static func feedComposedWith(
     feedLoader: @escaping() -> AnyPublisher<[FeedImage], Error>,
     imageLoader: @escaping (URL) -> FeedImageDataLoader.Publisher
-  ) -> FeedViewController {
+  ) -> ListViewController {
     // when we loading the feed using generic:
     // Resource = [FeedImage] and the View = FeedViewAdapter
     // we moved type definition to the one level above which makes LoadResourcePresentationAdapter generic over the Resource and the ResourceView
@@ -36,10 +36,10 @@ public final class FeedUIComposer {
     return feedController
   }
 
-  private static func makeFeedViewController(delegate: FeedViewControllerDelegate, title: String) -> FeedViewController {
-    let bundle = Bundle(for: FeedViewController.self)
+  private static func makeFeedViewController(delegate: FeedViewControllerDelegate, title: String) -> ListViewController {
+    let bundle = Bundle(for: ListViewController.self)
     let storyboard = UIStoryboard(name: "Feed", bundle: bundle)
-    let feedController = storyboard.instantiateInitialViewController() as! FeedViewController
+    let feedController = storyboard.instantiateInitialViewController() as! ListViewController
     feedController.delegate = delegate
     feedController.title = title
     return feedController

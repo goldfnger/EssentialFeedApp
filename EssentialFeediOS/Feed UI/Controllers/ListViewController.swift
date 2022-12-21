@@ -8,10 +8,6 @@
 import UIKit
 import EssentialFeed
 
-public protocol FeedViewControllerDelegate {
-  func didRequestFeedRefresh()
-}
-
 public protocol CellController {
   func view(in: UITableView) -> UITableViewCell
   func preLoad()
@@ -19,7 +15,6 @@ public protocol CellController {
 }
 
 public final class ListViewController: UITableViewController, UITableViewDataSourcePrefetching, ResourceLoadingView, ResourceErrorView {
-  public var delegate: FeedViewControllerDelegate?
   @IBOutlet private(set) public var errorView: ErrorView?
 
   private var loadingControllers = [IndexPath: CellController]()
@@ -28,6 +23,10 @@ public final class ListViewController: UITableViewController, UITableViewDataSou
   private var tableModel = [CellController]() {
     didSet {tableView.reloadData() }
   }
+
+  // every protocol with 1 function as it was in 'FeedViewControllerDelegate' can be replaced with closure
+  // so closure will be used to initiate 'loadResource'
+  public var onRefresh: (() -> Void)?
 
   public override func viewDidLoad() {
     super.viewDidLoad()
@@ -42,7 +41,7 @@ public final class ListViewController: UITableViewController, UITableViewDataSou
   }
 
   @IBAction private func refresh() {
-    delegate?.didRequestFeedRefresh()
+    onRefresh?()
   }
 
   public func display(_ cellControllers: [CellController]) {

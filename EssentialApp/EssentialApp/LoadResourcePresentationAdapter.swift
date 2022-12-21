@@ -46,13 +46,6 @@ final class LoadResourcePresentationAdapter<Resource, View: ResourceView> {
   }
 }
 
-extension LoadResourcePresentationAdapter: FeedViewControllerDelegate {
-  // every-time "FeedViewController" requests to load the feed through its delegate we just call "loadResource"
-  func didRequestFeedRefresh() {
-    loadResource()
-  }
-}
-
 extension LoadResourcePresentationAdapter: FeedImageCellControllerDelegate {
   func didRequestImage() {
     loadResource()

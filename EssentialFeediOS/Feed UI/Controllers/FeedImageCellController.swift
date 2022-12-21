@@ -28,8 +28,8 @@ public final class FeedImageCellController: NSObject {
   }
 }
 
-// implements here all needed methods
-extension FeedImageCellController: CellController {
+// implements here all needed protocols and methods
+extension FeedImageCellController: UITableViewDataSource, UITableViewDelegate, UITableViewDataSourcePrefetching {
 
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     1

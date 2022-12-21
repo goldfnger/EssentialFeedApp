@@ -39,6 +39,7 @@
 		8B833F26292FBB8E0025BEE7 /* CoreDataFeedStore+FeedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B833F25292FBB8E0025BEE7 /* CoreDataFeedStore+FeedStore.swift */; };
 		8B83E9C52927B60E00B11520 /* FeedPresenterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B83E9C42927B60E00B11520 /* FeedPresenterTests.swift */; };
 		8B83E9C72927BFFF00B11520 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B83E9C62927BFFF00B11520 /* ErrorView.swift */; };
+		8B90C6232953664D00D7DF61 /* CellController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B90C6222953664D00D7DF61 /* CellController.swift */; };
 		8B957A7F28FDAC8100ADBD3A /* LoadFeedFromCacheUseCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B957A7E28FDAC8100ADBD3A /* LoadFeedFromCacheUseCaseTests.swift */; };
 		8B957A8228FDADA300ADBD3A /* FeedStoreSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B957A8128FDADA300ADBD3A /* FeedStoreSpy.swift */; };
 		8B957A842901998200ADBD3A /* ValidateFeedCacheUseCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B957A832901998200ADBD3A /* ValidateFeedCacheUseCaseTests.swift */; };
@@ -209,6 +210,7 @@
 		8B833F25292FBB8E0025BEE7 /* CoreDataFeedStore+FeedStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoreDataFeedStore+FeedStore.swift"; sourceTree = "<group>"; };
 		8B83E9C42927B60E00B11520 /* FeedPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedPresenterTests.swift; sourceTree = "<group>"; };
 		8B83E9C62927BFFF00B11520 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
+		8B90C6222953664D00D7DF61 /* CellController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellController.swift; sourceTree = "<group>"; };
 		8B957A7E28FDAC8100ADBD3A /* LoadFeedFromCacheUseCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadFeedFromCacheUseCaseTests.swift; sourceTree = "<group>"; };
 		8B957A8128FDADA300ADBD3A /* FeedStoreSpy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedStoreSpy.swift; sourceTree = "<group>"; };
 		8B957A832901998200ADBD3A /* ValidateFeedCacheUseCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidateFeedCacheUseCaseTests.swift; sourceTree = "<group>"; };
@@ -575,6 +577,7 @@
 		8B9995B2295320A400EFF296 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				8B90C6222953664D00D7DF61 /* CellController.swift */,
 				8BF9663D2912888800A604E4 /* ListViewController.swift */,
 			);
 			path = Controllers;
@@ -1158,6 +1161,7 @@
 				8B2DE94D29478216007B1811 /* UITableView+HeaderSizing.swift in Sources */,
 				8B83E9C72927BFFF00B11520 /* ErrorView.swift in Sources */,
 				8BBB53582927DFFA007B85B2 /* UIRefreshControl+Helpers.swift in Sources */,
+				8B90C6232953664D00D7DF61 /* CellController.swift in Sources */,
 				8BF966422912B28A00A604E4 /* UIView+Shimmering.swift in Sources */,
 				8B4AAAFC291DB1BD00481073 /* UITableView+Dequeueing.swift in Sources */,
 				8BF9663E2912888800A604E4 /* ListViewController.swift in Sources */,

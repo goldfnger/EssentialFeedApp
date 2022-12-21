@@ -9,7 +9,7 @@ import UIKit
 import EssentialFeed
 
 // to implement CellController UIKit protocols we need to be an NSObject
-public class ImageCommentCellController: NSObject, CellController {
+public class ImageCommentCellController: NSObject, UITableViewDataSource {
   private let model: ImageCommentViewModel
 
   public init(model: ImageCommentViewModel) {
@@ -29,7 +29,4 @@ public class ImageCommentCellController: NSObject, CellController {
 
     return cell
   }
-
-  // we dont need this method for ImageComment
-  public func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {}
 }

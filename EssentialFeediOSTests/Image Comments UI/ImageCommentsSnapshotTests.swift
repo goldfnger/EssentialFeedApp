@@ -33,6 +33,12 @@ final class ImageCommentsSnapshotTests: XCTestCase {
   }
 
   private func comments() -> [CellController] {
+    // will call 'commentControllers' map and we create here the 'CellController' with the view - in this case it only implements dataSource
+    // in 'CellController' more comments
+    commentControllers().map { CellController($0) }
+  }
+
+  private func commentControllers() -> [ImageCommentCellController] {
     return [
       ImageCommentCellController(
         model: ImageCommentViewModel(

@@ -8,13 +8,20 @@
 import UIKit
 import EssentialFeed
 
-public class ImageCommentCellController: CellController {
+// to implement CellController UIKit protocols we need to be an NSObject
+public class ImageCommentCellController: NSObject, CellController {
   private let model: ImageCommentViewModel
 
   public init(model: ImageCommentViewModel) {
     self.model = model
   }
-  public func view(in tableView: UITableView) -> UITableViewCell {
+
+  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    // it only manages one cell (each cell controller manages one cell for one model)
+    1
+  }
+
+  public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell: ImageCommentCell = tableView.dequeueReusableCell()
     cell.messageLabel.text = model.message
     cell.usernameLabel.text = model.username
@@ -22,4 +29,7 @@ public class ImageCommentCellController: CellController {
 
     return cell
   }
+
+  // we dont need this method for ImageComment
+  public func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {}
 }

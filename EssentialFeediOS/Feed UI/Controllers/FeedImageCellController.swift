@@ -13,9 +13,9 @@ public protocol FeedImageCellControllerDelegate {
   func didCancelImageRequest()
 }
 
-// implement ResourceView
-public final class FeedImageCellController: CellController, ResourceView, ResourceLoadingView, ResourceErrorView {
-  // and define the type here
+public final class FeedImageCellController: NSObject {
+
+  // 2. and define the type here
   public typealias ResourceViewModel = UIImage
 
   private let viewModel: FeedImageViewModel
@@ -26,29 +26,51 @@ public final class FeedImageCellController: CellController, ResourceView, Resour
     self.viewModel = viewModel
     self.delegate = delegate
   }
+}
 
-  public func view(in tableView: UITableView) -> UITableViewCell {
+// implements here all needed methods
+extension FeedImageCellController: CellController {
+
+  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    1
+  }
+
+  public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     cell = tableView.dequeueReusableCell()
     cell?.locationContainer.isHidden = !viewModel.hasLocation
     cell?.locationLabel.text = viewModel.location
     cell?.descriptionLabel.text = viewModel.description
-//    cell?.accessibilityIdentifier = "feed-image-cell"
-//    cell?.feedImageView.accessibilityIdentifier = "feed-image-view"
     // here we assign 'delegate.didRequestImage' action for the retry button
     cell?.onRetry = delegate.didRequestImage
     delegate.didRequestImage()
     return cell!
   }
 
-  public func preLoad() {
+  public func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    cancelLoad()
+  }
+
+  // we moved logic of deciding what to do with delegates and 'dataSourcePrefetching' to the cell controller so it controls whole lifecycle of its cell now. This way much cleaner and much easier to manage.
+  public func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
     delegate.didRequestImage()
   }
 
-  public func cancelLoad() {
+  public func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
+    cancelLoad()
+  }
+
+  private func cancelLoad() {
     releaseCellForReuse()
     delegate.didCancelImageRequest()
   }
 
+  private func releaseCellForReuse() {
+    cell = nil
+  }
+}
+
+// 1. implement ResourceView
+extension FeedImageCellController: ResourceView, ResourceLoadingView, ResourceErrorView {
   // we had one method was rendering the FeedImageViewModel. Now we are split one into multiple methods into multiple view models so we can reuse the shared logic
   public func display(_ viewModel: UIImage) {
     cell?.feedImageView.setImageAnimated(viewModel)
@@ -60,9 +82,5 @@ public final class FeedImageCellController: CellController, ResourceView, Resour
 
   public func display(_ viewModel: ResourceErrorViewModel) {
     cell?.feedImageRetryButton.isHidden = viewModel.message == nil
-  }
-
-  private func releaseCellForReuse() {
-    cell = nil
   }
 }

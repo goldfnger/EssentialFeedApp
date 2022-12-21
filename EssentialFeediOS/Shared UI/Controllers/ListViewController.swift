@@ -8,17 +8,8 @@
 import UIKit
 import EssentialFeed
 
-public protocol CellController {
-  func view(in: UITableView) -> UITableViewCell
-  func preLoad()
-  func cancelLoad()
-}
-
-// making extension like this we can provide default implementations which will prevent other 'controllers' from implementations which they dont want to
-public extension CellController {
-  func preLoad() {}
-  func cancelLoad() {}
-}
+// this typealias defines a type that needs to conform to all those three protocols
+public typealias CellController = UITableViewDataSource & UITableViewDelegate & UITableViewDataSourcePrefetching
 
 public final class ListViewController: UITableViewController, UITableViewDataSourcePrefetching, ResourceLoadingView, ResourceErrorView {
   @IBOutlet private(set) public var errorView: ErrorView?
@@ -68,21 +59,30 @@ public final class ListViewController: UITableViewController, UITableViewDataSou
   }
 
   public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    return cellController(forRowAt: indexPath).view(in: tableView)
+    // the controller is dispatching the methods, so in 'cellForRowAt' we have now the controller dispatching cell for row at 'indexPath' for each cell.
+    // because each cell controller need to implement 'CellController' typealias protocols
+    let controller = cellController(forRowAt: indexPath)
+    return controller.tableView(tableView, cellForRowAt: indexPath)
   }
 
   public override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    cancelCellController(forRowAt: indexPath)
+    // we are just forward the message to the controller
+    let controller = removeLoadingController(forRowAt: indexPath)
+    controller?.tableView?(tableView, didEndDisplaying: cell, forRowAt: indexPath)
   }
 
   public func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
     indexPaths.forEach { indexPath in
-      cellController(forRowAt: indexPath).preLoad()
+      let controller = cellController(forRowAt: indexPath)
+      controller.tableView(tableView, prefetchRowsAt: [indexPath])
     }
   }
 
   public func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
-    indexPaths.forEach(cancelCellController)
+    indexPaths.forEach { indexPath in
+      let controller = removeLoadingController(forRowAt: indexPath)
+      controller?.tableView?(tableView, cancelPrefetchingForRowsAt: [indexPath])
+    }
   }
 
   private func cellController(forRowAt indexPath: IndexPath) -> CellController {
@@ -91,8 +91,11 @@ public final class ListViewController: UITableViewController, UITableViewDataSou
     return controller
   }
 
-  private func cancelCellController(forRowAt indexPath: IndexPath) {
-    loadingControllers[indexPath]?.cancelLoad()
+  private func removeLoadingController(forRowAt indexPath: IndexPath) -> CellController? {
+    // get controller
+    let controller = loadingControllers[indexPath]
+    // set 'nil' in the dictionary where we are keeping track
     loadingControllers[indexPath] = nil
+    return controller
   }
 }

@@ -14,6 +14,12 @@ public protocol CellController {
   func cancelLoad()
 }
 
+// making extension like this we can provide default implementations which will prevent other 'controllers' from implementations which they dont want to
+public extension CellController {
+  func preLoad() {}
+  func cancelLoad() {}
+}
+
 public final class ListViewController: UITableViewController, UITableViewDataSourcePrefetching, ResourceLoadingView, ResourceErrorView {
   @IBOutlet private(set) public var errorView: ErrorView?
 

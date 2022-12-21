@@ -14,7 +14,7 @@ public protocol FeedImageCellControllerDelegate {
 }
 
 // implement ResourceView
-public final class FeedImageCellController: ResourceView, ResourceLoadingView, ResourceErrorView {
+public final class FeedImageCellController: CellController, ResourceView, ResourceLoadingView, ResourceErrorView {
   // and define the type here
   public typealias ResourceViewModel = UIImage
 
@@ -27,23 +27,24 @@ public final class FeedImageCellController: ResourceView, ResourceLoadingView, R
     self.delegate = delegate
   }
 
-  func view(in tableView: UITableView) -> UITableViewCell {
+  public func view(in tableView: UITableView) -> UITableViewCell {
     cell = tableView.dequeueReusableCell()
     cell?.locationContainer.isHidden = !viewModel.hasLocation
     cell?.locationLabel.text = viewModel.location
     cell?.descriptionLabel.text = viewModel.description
 //    cell?.accessibilityIdentifier = "feed-image-cell"
 //    cell?.feedImageView.accessibilityIdentifier = "feed-image-view"
+    // here we assign 'delegate.didRequestImage' action for the retry button
     cell?.onRetry = delegate.didRequestImage
     delegate.didRequestImage()
     return cell!
   }
 
-  func preLoad() {
+  public func preLoad() {
     delegate.didRequestImage()
   }
 
-  func cancelLoad() {
+  public func cancelLoad() {
     releaseCellForReuse()
     delegate.didCancelImageRequest()
   }

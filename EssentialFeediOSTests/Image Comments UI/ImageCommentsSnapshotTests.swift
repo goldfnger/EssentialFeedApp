@@ -36,7 +36,8 @@ final class ImageCommentsSnapshotTests: XCTestCase {
   private func comments() -> [CellController] {
     // will call 'commentControllers' map and we create here the 'CellController' with the view - in this case it only implements dataSource
     // in 'CellController' more comments
-    commentControllers().map { CellController($0) }
+    // in tests we dont care about 'id' because we dont want to keep track of changes
+    commentControllers().map { CellController(id: UUID(), $0) }
   }
 
   private func commentControllers() -> [ImageCommentCellController] {

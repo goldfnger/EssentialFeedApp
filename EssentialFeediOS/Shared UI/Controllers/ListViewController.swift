@@ -13,10 +13,14 @@ public final class ListViewController: UITableViewController, UITableViewDataSou
 
   private var loadingControllers = [IndexPath: CellController]()
 
-  // collection of 'CellController', where every 'controller' controls one cell each
-  private var tableModel = [CellController]() {
-    didSet {tableView.reloadData() }
-  }
+  // creating a default diffable 'dataSource' with 'tableView'
+  // it will handle all the updates for us automatically. thats why removed previous 'tableModel'.
+  private lazy var dataSource: UITableViewDiffableDataSource<Int, CellController> = {
+    .init(tableView: tableView) { (tableView, index, controller) -> UITableViewCell? in
+      // returning cell
+      return controller.dataSource.tableView(tableView, cellForRowAt: index)
+    }
+  }()
 
   // every protocol with 1 function as it was in 'FeedViewControllerDelegate' can be replaced with closure
   // so closure will be used to initiate 'loadResource'
@@ -25,6 +29,7 @@ public final class ListViewController: UITableViewController, UITableViewDataSou
   public override func viewDidLoad() {
     super.viewDidLoad()
 
+    tableView.dataSource = dataSource
     configureErrorView()
     refresh()
   }
@@ -60,13 +65,27 @@ public final class ListViewController: UITableViewController, UITableViewDataSou
     tableView.sizeTableHeaderToFit()
   }
 
+  // if change was in previous 'category' (font sizing set by user), then we reload tableview.
+  // this needs because there might be problems when using 'diffable data source' and 'dynamic fonts'.
+  public override func traitCollectionDidChange(_ previous: UITraitCollection?) {
+    if previous?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory {
+      tableView.reloadData()
+    }
+  }
+
   @IBAction private func refresh() {
     onRefresh?()
   }
 
+  // 1. everytime we get new 'CellController'
   public func display(_ cellControllers: [CellController]) {
-    loadingControllers = [:]
-    tableModel = cellControllers
+    // 2. we create an empty snapshot
+    var snapshot = NSDiffableDataSourceSnapshot<Int, CellController>()
+    // 3. we append the new controllers
+    snapshot.appendSections([0])
+    snapshot.appendItems(cellControllers, toSection: 0)
+    // 4. tell data source to apply. 'dataSource' will check what changed using 'Hashable' and only update what is necessary
+    dataSource.apply(snapshot)
   }
 
   public func display(_ viewModel: ResourceLoadingViewModel) {
@@ -76,49 +95,31 @@ public final class ListViewController: UITableViewController, UITableViewDataSou
   public func display(_ viewModel: ResourceErrorViewModel) {
     errorView.message = viewModel.message
   }
-  
-  public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return tableModel.count
-  }
 
-  public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    // the controller is dispatching the methods, so in 'cellForRowAt' we have now the controller dispatching cell for row at 'indexPath' for each cell.
-    // because each cell controller need to implement 'CellController' typealias protocols
-    let ds = cellController(forRowAt: indexPath).dataSource
-    return ds.tableView(tableView, cellForRowAt: indexPath)
-  }
+  // 'numberOfRowsInSection' & 'cellForRowAt' are removed because 'dataSource' now is the diffable data source.
+  // only requires to set new data source in 'ViewDidLoad'.
 
   public override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    let dl = removeLoadingController(forRowAt: indexPath)?.delegate
+    let dl = cellController(at: indexPath)?.delegate
     // we are just forward/delegate the message to the controller
     dl?.tableView?(tableView, didEndDisplaying: cell, forRowAt: indexPath)
   }
 
   public func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
     indexPaths.forEach { indexPath in
-      let dsp = cellController(forRowAt: indexPath).dataSourcePrefetching
+      let dsp = cellController(at: indexPath)?.dataSourcePrefetching
       dsp?.tableView(tableView, prefetchRowsAt: [indexPath])
     }
   }
 
   public func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
     indexPaths.forEach { indexPath in
-      let dsp = removeLoadingController(forRowAt: indexPath)?.dataSourcePrefetching
+      let dsp = cellController(at: indexPath)?.dataSourcePrefetching
       dsp?.tableView?(tableView, cancelPrefetchingForRowsAt: [indexPath])
     }
   }
 
-  private func cellController(forRowAt indexPath: IndexPath) -> CellController {
-    let controller = tableModel[indexPath.row]
-    loadingControllers[indexPath] = controller
-    return controller
-  }
-
-  private func removeLoadingController(forRowAt indexPath: IndexPath) -> CellController? {
-    // get controller
-    let controller = loadingControllers[indexPath]
-    // set 'nil' in the dictionary where we are keeping track
-    loadingControllers[indexPath] = nil
-    return controller
+  private func cellController(at indexPath: IndexPath) -> CellController? {
+    dataSource.itemIdentifier(for: indexPath)
   }
 }

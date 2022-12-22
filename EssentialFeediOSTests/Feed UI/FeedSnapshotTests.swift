@@ -71,7 +71,8 @@ private extension ListViewController {
       let cellController = FeedImageCellController(viewModel: stub.viewModel, delegate: stub)
       stub.controller = cellController
       // because 'FeedImageCellController' implements all 3 protocols - 'CellController' init() will make it internally
-      return CellController(cellController)
+      // in tests we dont care about 'id' because we dont want to keep track of changes
+      return CellController(id: UUID(), cellController)
     }
 
     display(cells)

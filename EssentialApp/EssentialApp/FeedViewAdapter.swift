@@ -44,7 +44,8 @@ final class FeedViewAdapter: ResourceView {
 
       // because 'CellController' now is a struct and because 'FeedImageCellController' implements all 3 protocols(defined in 'CellController') we can pass simply one 'view' and init() will set all 3 sources internally.
       // If we dont care about 'delegate' and 'dataSourcePrefetching' we can use another init() which will internally set mandatory 'dataSource' and others will set as 'nil'
-      return CellController(view)
+      // adding 'id' with 'Hashable' model will automatically tell UI to redraw that cell if any changes happens to the model. (diffable data source).
+      return CellController(id: model, view)
     })
   }
 }

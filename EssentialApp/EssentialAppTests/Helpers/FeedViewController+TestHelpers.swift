@@ -9,6 +9,14 @@ import UIKit
 import EssentialFeediOS
 
 extension ListViewController {
+  public override func loadViewIfNeeded() {
+    super.loadViewIfNeeded()
+
+    // by this we prevent loading cells ahead of time with 'diffable data source' in all tests which are using 'loadViewIfNeeded'
+    // the way it works, we set 'tableView' to a very very small frame - this way there is not enough space to render the cells which is not going to load them ahead of time, only when we call the methods
+    tableView.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
+  }
+
   func simulateUserInitiatedFeedReload() {
     refreshControl?.simulatePullToRefresh()
   }
@@ -60,7 +68,7 @@ extension ListViewController {
   }
 
   func numberOfRenderedFeedImageViews() -> Int {
-    return tableView.numberOfRows(inSection: feedImagesSection)
+    return tableView.numberOfSections == 0 ? 0 : tableView.numberOfRows(inSection: feedImagesSection)
   }
 
   func feedImageView(at row: Int) -> UITableViewCell? {

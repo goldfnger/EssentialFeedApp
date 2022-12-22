@@ -100,6 +100,11 @@ public final class ListViewController: UITableViewController, UITableViewDataSou
     errorView.message = viewModel.message
   }
 
+  public override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    let dl = cellController(at: indexPath)?.delegate
+    dl?.tableView?(tableView, willDisplay: cell, forRowAt: indexPath)
+  }
+
   // 'numberOfRowsInSection' & 'cellForRowAt' are removed because 'dataSource' now is the diffable data source.
   // only requires to set new data source in 'ViewDidLoad'.
 

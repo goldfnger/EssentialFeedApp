@@ -8,6 +8,7 @@
 import UIKit
 
 extension UITableView {
+  // will resize table header to properly fit element inside it
   func sizeTableHeaderToFit() {
     guard let header = tableHeaderView else { return }
 

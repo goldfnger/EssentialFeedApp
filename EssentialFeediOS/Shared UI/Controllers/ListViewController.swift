@@ -85,7 +85,11 @@ public final class ListViewController: UITableViewController, UITableViewDataSou
     snapshot.appendSections([0])
     snapshot.appendItems(cellControllers, toSection: 0)
     // 4. tell data source to apply. 'dataSource' will check what changed using 'Hashable' and only update what is necessary
-    dataSource.apply(snapshot)
+    if #available(iOS 15.0, *) {
+      dataSource.applySnapshotUsingReloadData(snapshot)
+    } else {
+      dataSource.apply(snapshot)
+    }
   }
 
   public func display(_ viewModel: ResourceLoadingViewModel) {

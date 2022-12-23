@@ -21,7 +21,7 @@ public final class CommentsUIComposer {
     // we moved type definition to the one level above which makes LoadResourcePresentationAdapter generic over the Resource and the ResourceView
     let presentationAdapter = LoadResourcePresentationAdapter<[FeedImage], FeedViewAdapter>(loader: commentsLoader)
 
-    let feedController = makeFeedViewController(title: FeedPresenter.title)
+    let feedController = makeFeedViewController(title: ImageCommentsPresenter.title)
     feedController.onRefresh = presentationAdapter.loadResource
 
     presentationAdapter.presenter = LoadResourcePresenter(

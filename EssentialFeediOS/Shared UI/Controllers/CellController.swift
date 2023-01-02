@@ -24,7 +24,7 @@ public struct CellController {
     self.dataSourcePrefetching = dataSource
   }
 
-  // if we have a case with a type that implements only dataSource
+  // if we have a case with a type that implements only dataSource (like a 'ImageCommentCellController')
   public init(id: AnyHashable, _ dataSource: UITableViewDataSource) {
     self.id = id
     self.dataSource = dataSource

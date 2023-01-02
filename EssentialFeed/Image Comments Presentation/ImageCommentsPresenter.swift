@@ -13,7 +13,7 @@ public struct  ImageCommentsViewModel {
 }
 
 // model with comment data to display
-public struct ImageCommentViewModel: Equatable {
+public struct ImageCommentViewModel: Hashable {
   public let message: String
   public let date: String
   public let username: String

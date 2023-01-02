@@ -15,7 +15,7 @@
 		8B0C3E96293A1D470098AFC1 /* UIImage+TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0C3E8E293A1D450098AFC1 /* UIImage+TestHelpers.swift */; };
 		8B0C3E98293A1D470098AFC1 /* FeedImageCell+TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0C3E90293A1D460098AFC1 /* FeedImageCell+TestHelpers.swift */; };
 		8B0C3E99293A1D470098AFC1 /* UIButton+TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0C3E93293A1D460098AFC1 /* UIButton+TestHelpers.swift */; };
-		8B0C3E9A293A1D470098AFC1 /* FeedViewController+TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0C3E94293A1D470098AFC1 /* FeedViewController+TestHelpers.swift */; };
+		8B0C3E9A293A1D470098AFC1 /* ListViewController+TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0C3E94293A1D470098AFC1 /* ListViewController+TestHelpers.swift */; };
 		8B0C3E9B293A1D470098AFC1 /* UIControl+TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0C3E8F293A1D450098AFC1 /* UIControl+TestHelpers.swift */; };
 		8B0C3E9C293A1D470098AFC1 /* FeedViewControllerTests+LoaderSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0C3E8D293A1D450098AFC1 /* FeedViewControllerTests+LoaderSpy.swift */; };
 		8B0C3E9D293A1D470098AFC1 /* UIRefreshControl+TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0C3E91293A1D460098AFC1 /* UIRefreshControl+TestHelpers.swift */; };
@@ -81,7 +81,7 @@
 		8B0C3E90293A1D460098AFC1 /* FeedImageCell+TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FeedImageCell+TestHelpers.swift"; sourceTree = "<group>"; };
 		8B0C3E91293A1D460098AFC1 /* UIRefreshControl+TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIRefreshControl+TestHelpers.swift"; sourceTree = "<group>"; };
 		8B0C3E93293A1D460098AFC1 /* UIButton+TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+TestHelpers.swift"; sourceTree = "<group>"; };
-		8B0C3E94293A1D470098AFC1 /* FeedViewController+TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FeedViewController+TestHelpers.swift"; sourceTree = "<group>"; };
+		8B0C3E94293A1D470098AFC1 /* ListViewController+TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListViewController+TestHelpers.swift"; sourceTree = "<group>"; };
 		8B0C3E95293A1D470098AFC1 /* FeedViewControllerTests+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FeedViewControllerTests+Assertions.swift"; sourceTree = "<group>"; };
 		8B0C3E9F293A1D760098AFC1 /* FeedUIIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedUIIntegrationTests.swift; sourceTree = "<group>"; };
 		8B0C3EA1293A1F420098AFC1 /* FeedAcceptanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedAcceptanceTests.swift; sourceTree = "<group>"; };
@@ -194,7 +194,7 @@
 				8B0C3E91293A1D460098AFC1 /* UIRefreshControl+TestHelpers.swift */,
 				8B0C3E93293A1D460098AFC1 /* UIButton+TestHelpers.swift */,
 				8B0C3E8F293A1D450098AFC1 /* UIControl+TestHelpers.swift */,
-				8B0C3E94293A1D470098AFC1 /* FeedViewController+TestHelpers.swift */,
+				8B0C3E94293A1D470098AFC1 /* ListViewController+TestHelpers.swift */,
 				8B0C3E90293A1D460098AFC1 /* FeedImageCell+TestHelpers.swift */,
 				8B0C3E8D293A1D450098AFC1 /* FeedViewControllerTests+LoaderSpy.swift */,
 				8B0C3E95293A1D470098AFC1 /* FeedViewControllerTests+Assertions.swift */,
@@ -328,7 +328,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8B0C3E9A293A1D470098AFC1 /* FeedViewController+TestHelpers.swift in Sources */,
+				8B0C3E9A293A1D470098AFC1 /* ListViewController+TestHelpers.swift in Sources */,
 				8B833F922932669F0025BEE7 /* SharedTestHelpers.swift in Sources */,
 				8B0C3E9C293A1D470098AFC1 /* FeedViewControllerTests+LoaderSpy.swift in Sources */,
 				8B0C3E9B293A1D470098AFC1 /* UIControl+TestHelpers.swift in Sources */,

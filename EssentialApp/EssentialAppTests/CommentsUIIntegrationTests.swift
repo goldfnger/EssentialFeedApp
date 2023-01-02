@@ -135,6 +135,37 @@ final class CommentsUIIntegrationTests: XCTestCase {
     XCTAssertEqual(sut.errorMessage, nil)
    }
 
+  func test_deinit_cancelsRunningRequests() {
+    var cancelCallCount = 0
+
+    var sut: ListViewController?
+
+    // we are using 'autoreleasepool' because when test is finished in fact memory is released ('trackForMemoryLeaks' checks that).
+    // probably XCTest is running every test within its own 'autoreleasepool' and keep reference to it outside this test.
+    // to control autoreleased lifetime we can create our own 'autoreleasepool' within the test that will only be released when we exit this test.
+    autoreleasepool {
+      // instantiate viewcontroller
+      sut = CommentsUIComposer.commentsComposedWith(commentsLoader: {
+        // because 'commentsLoader' is function that returns 'publishers' we need to create our own 'PassthroughSubject'
+        PassthroughSubject<[ImageComment], Error>()
+          .handleEvents(receiveCancel: {
+            // and increment 'cancelCallCount' on cancel event (which should be triggered automatically once 'ListViewController' is de-initialized)
+            cancelCallCount += 1
+          }).eraseToAnyPublisher()
+      })
+
+      // will trigger loading method
+      sut?.loadViewIfNeeded()
+    }
+
+    XCTAssertEqual(cancelCallCount, 0)
+
+    // setting as 'nil' makes 'viewController' trigger 'deInit()' method which should automatically de-initialize and increment 'cancelCallCount'
+    sut = nil
+
+    XCTAssertEqual(cancelCallCount, 1)
+  }
+
   //MARK: - Helpers
 
   private func makeSUT(file: StaticString = #filePath,

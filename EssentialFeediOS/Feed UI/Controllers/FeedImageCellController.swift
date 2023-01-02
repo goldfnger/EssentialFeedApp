@@ -20,11 +20,13 @@ public final class FeedImageCellController: NSObject {
 
   private let viewModel: FeedImageViewModel
   private let delegate: FeedImageCellControllerDelegate
+  private let selection: () -> Void
   private var cell: FeedImageCell?
 
-  public init(viewModel: FeedImageViewModel, delegate: FeedImageCellControllerDelegate) {
+  public init(viewModel: FeedImageViewModel, delegate: FeedImageCellControllerDelegate, selection: @escaping() -> Void) {
     self.viewModel = viewModel
     self.delegate = delegate
+    self.selection = selection
   }
 }
 
@@ -46,6 +48,13 @@ extension FeedImageCellController: UITableViewDataSource, UITableViewDelegate, U
     }
     delegate.didRequestImage()
     return cell!
+  }
+
+  // can receive the message and we need to delegate back as well the message to someone that can handle that image (here we have only 'FeedImageViewModel' but we need someone that knows about 'FeedImage')
+  // we could add additional method to 'FeedImageCellControllerDelegate', but instead we can use 'initializer injection' and pass a closure 'selection'
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    // we call closure when there is a selection in this view
+    selection()
   }
 
   public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {

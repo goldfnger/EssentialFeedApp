@@ -100,6 +100,14 @@ public final class ListViewController: UITableViewController, UITableViewDataSou
     errorView.message = viewModel.message
   }
 
+  // when there is selection 'did select' we need to send a message to whoever is responsible for handling events at that row
+  public override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    // we get 'cellController' delegate
+    let dl = cellController(at: indexPath)?.delegate
+    // and forward the message
+    dl?.tableView?(tableView, didSelectRowAt: indexPath)
+  }
+
   public override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     let dl = cellController(at: indexPath)?.delegate
     dl?.tableView?(tableView, willDisplay: cell, forRowAt: indexPath)

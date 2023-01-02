@@ -12,16 +12,20 @@ import EssentialFeediOS
 final class FeedViewAdapter: ResourceView {
   private weak var controller: ListViewController?
   private let imageLoader: (URL) -> FeedImageDataLoader.Publisher
+  private let selection: (FeedImage) -> Void
 
-  init(controller: ListViewController, imageLoader: @escaping (URL) -> FeedImageDataLoader.Publisher) {
+  private typealias ImageDataPresentationAdapter = LoadResourcePresentationAdapter<Data, WeakRefVirtualProxy<FeedImageCellController>>
+
+  init(controller: ListViewController, imageLoader: @escaping (URL) -> FeedImageDataLoader.Publisher, selection: @escaping (FeedImage) -> Void) {
     self.controller = controller
     self.imageLoader = imageLoader
+    self.selection = selection
   }
 
   func display(_ viewModel: FeedViewModel) {
     controller?.display(viewModel.feed.map { model in
       // pass a custom closure 'loader: {}' that calls the image loader with the model URL - we are adapting the image loader method that takes one parameter '(URL)' into a method that takes no parameters and it holds the model URL (also called partial application of functions)
-      let adapter = LoadResourcePresentationAdapter<Data, WeakRefVirtualProxy<FeedImageCellController>>(loader: { [imageLoader] in
+      let adapter = ImageDataPresentationAdapter(loader: { [imageLoader] in
         imageLoader(model.url)
       })
 
@@ -29,7 +33,13 @@ final class FeedViewAdapter: ResourceView {
       // adapter implements the cell controller delegate to run the generic load resource logic
       let view = FeedImageCellController(
         viewModel: FeedImagePresenter.map(model),
-        delegate: adapter)
+        delegate: adapter,
+        // when there is a 'selection' the 'FeedViewAdapter' now he has the 'FeedImage' model
+        // so now we get the selection closure
+        selection: { [selection] in
+          // and we pass the 'FeedImage' model to it. (for that we need a 'selection' 'initlizer')
+          selection(model)
+        })
 
       adapter.presenter = LoadResourcePresenter(
         resourceView: WeakRefVirtualProxy(view),

@@ -25,15 +25,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       .appendingPathComponent("feed-store.sqlite"))
   }()
 
-  private var remoteURL: URL = {
-    return URL(string: "https://ile-api.essentialdeveloper.com/essential-feed/v1/feed")!
+  private lazy var baseURL: URL = {
+    return URL(string: "https://ile-api.essentialdeveloper.com/essential-feed")!
   }()
 
-  private lazy var remoteFeedLoader = httpClient.getPublisher(url: remoteURL).tryMap(FeedItemsMapper.map)
+  private lazy var remoteFeedLoader = httpClient.getPublisher(url: baseURL).tryMap(FeedItemsMapper.map)
 
   private lazy var localFeedLoader = {
     LocalFeedLoader(store: store, currentDate: Date.init)
   }()
+
+  private lazy var  navigationController = UINavigationController(
+    rootViewController: FeedUIComposer.feedComposedWith(
+      feedLoader: makeRemoteFeedLoaderWithLocalFallBack,
+      imageLoader: makeLocalImageLoaderWithRemoteFallback,
+      selection: showComments))
 
   convenience init(httpClient: HTTPClient, store: FeedStore & FeedImageDataStore) {
     self.init()
@@ -49,10 +55,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   }
 
   func configureWindow() {
-    window?.rootViewController = UINavigationController(
-      rootViewController: FeedUIComposer.feedComposedWith(
-      feedLoader: makeRemoteFeedLoaderWithLocalFallBack,
-      imageLoader: makeLocalImageLoaderWithRemoteFallback))
+    window?.rootViewController = navigationController
     window?.makeKeyAndVisible()
   }
 
@@ -60,7 +63,29 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     localFeedLoader.validateCache { _ in }
   }
 
+  // SceneDelegate listen to the event when an image is selected
+  private func showComments(for image: FeedImage) {
+    // creates the URL
+    let url = baseURL.appending(path: "/v1/image/\(image.id)/comments")
+
+    // and present it in the navigationController
+    let comments = CommentsUIComposer.commentsComposedWith(commentsLoader: makeRemoteCommentsLoader(url: url))
+    navigationController.pushViewController(comments, animated: true)
+  }
+
+  // should return a function that takes nothing and return 'Publisher'
+  private func makeRemoteCommentsLoader(url: URL) -> () -> AnyPublisher<[ImageComment], Error> {
+    return { [httpClient] in
+      return httpClient
+        .getPublisher(url: url)
+        .tryMap(ImageCommentsMapper.map)
+        .eraseToAnyPublisher()
+    }
+  }
+
   private func makeRemoteFeedLoaderWithLocalFallBack() -> AnyPublisher<[FeedImage], Error> {
+    let remoteURL = baseURL.appending(path: "/v1/feed")
+
     // wrapping the load function into Combine
     // [ side-effect ]
     return httpClient

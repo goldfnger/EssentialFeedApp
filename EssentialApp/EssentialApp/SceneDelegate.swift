@@ -66,7 +66,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   // SceneDelegate listen to the event when an image is selected
   private func showComments(for image: FeedImage) {
     // creates the URL
-    let url = baseURL.appending(path: "/v1/image/\(image.id)/comments")
+    let url = ImageCommentsEndpoint.get(image.id).url(baseURL: baseURL)
 
     // and present it in the navigationController
     let comments = CommentsUIComposer.commentsComposedWith(commentsLoader: makeRemoteCommentsLoader(url: url))
@@ -84,12 +84,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   }
 
   private func makeRemoteFeedLoaderWithLocalFallBack() -> AnyPublisher<[FeedImage], Error> {
-    let remoteURL = baseURL.appending(path: "/v1/feed")
+    let url = FeedEndpoint.get.url(baseURL: baseURL)
 
     // wrapping the load function into Combine
     // [ side-effect ]
     return httpClient
-      .getPublisher(url: remoteURL) // [ network request ]
+      .getPublisher(url: url) // [ network request ]
     // -pure function-
       .tryMap(FeedItemsMapper.map)  // -     mapping     -
     // [ side-effect ]

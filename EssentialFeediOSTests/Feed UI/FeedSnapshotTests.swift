@@ -30,6 +30,15 @@ final class FeedSnapshotTests: XCTestCase {
     assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark)), named: "FEED_WITH_FAILED_IMAGE_LOADING_dark")
   }
 
+  func test_feedWithLoadMoreIndicator() {
+    let sut = makeSUT()
+
+    sut.display(feedWithLoadMoreIndicator())
+
+    assert(snapshot: sut.snapshot(for: .iPhone8(style: .light)), named: "FEED_WITH_LOAD_MORE_INDICATOR_light")
+    assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark)), named: "FEED_WITH_LOAD_MORE_INDICATOR_dark")
+  }
+
   //MARK: - Helpers
 
   private func makeSUT() -> ListViewController {
@@ -61,6 +70,22 @@ final class FeedSnapshotTests: XCTestCase {
     return [
       ImageStub(description: nil, location: "Cannon Street, London", image: nil),
       ImageStub(description: nil, location: "Brighton Seafront", image: nil)
+    ]
+  }
+
+  private func feedWithLoadMoreIndicator() -> [CellController] {
+    // creating and getting just one last image stub
+    let stub = feedWithContent().last!
+    let cellController = FeedImageCellController(viewModel: stub.viewModel, delegate: stub, selection: {})
+    stub.controller = cellController
+
+    // setting 'spinner' after image
+    let loadMore = LoadMoreCellController()
+    loadMore.display(ResourceLoadingViewModel(isLoading: true))
+    // compose 'cellControllers' with 'loadMore' into the cell into the list view controller, because they are all cell controllers
+    return [
+      CellController(id: UUID(), cellController),
+      CellController(id: UUID(), loadMore)
     ]
   }
 }

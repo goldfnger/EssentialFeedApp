@@ -83,7 +83,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
   }
 
-  private func makeRemoteFeedLoaderWithLocalFallBack() -> AnyPublisher<[FeedImage], Error> {
+  private func makeRemoteFeedLoaderWithLocalFallBack() -> AnyPublisher<Paginated<FeedImage>, Error> {
     let url = FeedEndpoint.get.url(baseURL: baseURL)
 
     // wrapping the load function into Combine
@@ -95,6 +95,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // [ side-effect ]
       .caching(to: localFeedLoader) // [     caching     ]
       .fallback(to: localFeedLoader.loadPublisher)
+    // we get an array of items and we just wrap it in a paginated which does nothing
+      .map {
+        Paginated(items: $0)
+      }
+      .eraseToAnyPublisher()
   }
 
   private func makeLocalImageLoaderWithRemoteFallback(url: URL) -> FeedImageDataLoader.Publisher {

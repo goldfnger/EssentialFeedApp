@@ -22,8 +22,9 @@ final class FeedViewAdapter: ResourceView {
     self.selection = selection
   }
 
-  func display(_ viewModel: FeedViewModel) {
-    controller?.display(viewModel.feed.map { model in
+  // now should use Paginated<FeedImage> where we can access whole list of 'FeedImage' 'items'
+  func display(_ viewModel: Paginated<FeedImage>) {
+    controller?.display(viewModel.items.map { model in
       // pass a custom closure 'loader: {}' that calls the image loader with the model URL - we are adapting the image loader method that takes one parameter '(URL)' into a method that takes no parameters and it holds the model URL (also called partial application of functions)
       let adapter = ImageDataPresentationAdapter(loader: { [imageLoader] in
         imageLoader(model.url)

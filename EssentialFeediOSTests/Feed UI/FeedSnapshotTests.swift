@@ -39,6 +39,16 @@ final class FeedSnapshotTests: XCTestCase {
     assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark)), named: "FEED_WITH_LOAD_MORE_INDICATOR_dark")
   }
 
+  func test_feedWithLoadMoreError() {
+    let sut = makeSUT()
+
+    sut.display(feedWithLoadMoreError())
+
+    assert(snapshot: sut.snapshot(for: .iPhone8(style: .light)), named: "FEED_WITH_LOAD_MORE_ERROR_light")
+    assert(snapshot: sut.snapshot(for: .iPhone8(style: .dark)), named: "FEED_WITH_LOAD_MORE_ERROR_dark")
+    assert(snapshot: sut.snapshot(for: .iPhone8(style: .light, contentSize: .extraExtraExtraLarge)), named: "FEED_WITH_LOAD_MORE_ERROR_light_extraExtraExtraLarge")
+  }
+
   //MARK: - Helpers
 
   private func makeSUT() -> ListViewController {
@@ -74,14 +84,27 @@ final class FeedSnapshotTests: XCTestCase {
   }
 
   private func feedWithLoadMoreIndicator() -> [CellController] {
-    // creating and getting just one last image stub
+    // 2. setting 'spinner' after image
+    let loadMore = LoadMoreCellController()
+    loadMore.display(ResourceLoadingViewModel(isLoading: true))
+    // compose 'cellControllers' with 'loadMore' into the cell into the list view controller, because they are all cell controllers
+    return feedWith(loadMore: loadMore)
+  }
+
+  private func feedWithLoadMoreError() -> [CellController] {
+    // 2. setting 'spinner' after image
+    let loadMore = LoadMoreCellController()
+    loadMore.display(ResourceErrorViewModel(message: "This is a multiline\nerror message"))
+    // compose 'cellController' with 'loadMore' into the cell into the list view controller, because they are all cell controllers
+    return feedWith(loadMore: loadMore)
+  }
+
+  private func feedWith(loadMore: LoadMoreCellController) -> [CellController] {
+    // 1. creating and getting just one last image stub
     let stub = feedWithContent().last!
     let cellController = FeedImageCellController(viewModel: stub.viewModel, delegate: stub, selection: {})
     stub.controller = cellController
 
-    // setting 'spinner' after image
-    let loadMore = LoadMoreCellController()
-    loadMore.display(ResourceLoadingViewModel(isLoading: true))
     // compose 'cellControllers' with 'loadMore' into the cell into the list view controller, because they are all cell controllers
     return [
       CellController(id: UUID(), cellController),

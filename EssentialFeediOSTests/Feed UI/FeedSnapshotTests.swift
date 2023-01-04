@@ -68,7 +68,7 @@ final class FeedSnapshotTests: XCTestCase {
 private extension ListViewController {
   func display(_ stubs: [ImageStub]) {
     let cells: [CellController] = stubs.map { stub in
-      let cellController = FeedImageCellController(viewModel: stub.viewModel, delegate: stub)
+      let cellController = FeedImageCellController(viewModel: stub.viewModel, delegate: stub, selection: { } )
       stub.controller = cellController
       // because 'FeedImageCellController' implements all 3 protocols - 'CellController' init() will make it internally
       // in tests we dont care about 'id' because we dont want to keep track of changes

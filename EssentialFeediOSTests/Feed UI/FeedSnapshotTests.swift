@@ -85,7 +85,7 @@ final class FeedSnapshotTests: XCTestCase {
 
   private func feedWithLoadMoreIndicator() -> [CellController] {
     // 2. setting 'spinner' after image
-    let loadMore = LoadMoreCellController()
+    let loadMore = LoadMoreCellController(callback: {})
     loadMore.display(ResourceLoadingViewModel(isLoading: true))
     // compose 'cellControllers' with 'loadMore' into the cell into the list view controller, because they are all cell controllers
     return feedWith(loadMore: loadMore)
@@ -93,7 +93,7 @@ final class FeedSnapshotTests: XCTestCase {
 
   private func feedWithLoadMoreError() -> [CellController] {
     // 2. setting 'spinner' after image
-    let loadMore = LoadMoreCellController()
+    let loadMore = LoadMoreCellController(callback: {})
     loadMore.display(ResourceErrorViewModel(message: "This is a multiline\nerror message"))
     // compose 'cellController' with 'loadMore' into the cell into the list view controller, because they are all cell controllers
     return feedWith(loadMore: loadMore)

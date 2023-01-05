@@ -16,10 +16,10 @@ public struct Paginated<Item> {
   // items - hold the 'feed' so we know how many items we have loaded
   public let items: [Item]
   // closure to load more items. optional because if I have a closure that can load more it means I can load more, if I dont I can not load more
-  public let canLoad: ((@escaping LoadMoreCompletion) -> Void)?
+  public let loadMore: ((@escaping LoadMoreCompletion) -> Void)?
 
-  public init(items: [Item], canLoad: ((@escaping LoadMoreCompletion) -> Void)? = nil) {
+  public init(items: [Item], loadMore: ((@escaping LoadMoreCompletion) -> Void)? = nil) {
     self.items = items
-    self.canLoad = canLoad
+    self.loadMore = loadMore
   }
 }

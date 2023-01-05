@@ -9,6 +9,7 @@ import UIKit
 import EssentialFeed
 import EssentialFeediOS
 
+// here we create a cell controllers
 final class FeedViewAdapter: ResourceView {
   private weak var controller: ListViewController?
   private let imageLoader: (URL) -> FeedImageDataLoader.Publisher
@@ -24,7 +25,8 @@ final class FeedViewAdapter: ResourceView {
 
   // now should use Paginated<FeedImage> where we can access whole list of 'FeedImage' 'items'
   func display(_ viewModel: Paginated<FeedImage>) {
-    controller?.display(viewModel.items.map { model in
+    // here we have an array of 'CellController's for the 'feed' which is the first section(0) 'feed'
+    let feed: [CellController] = viewModel.items.map { model in
       // pass a custom closure 'loader: {}' that calls the image loader with the model URL - we are adapting the image loader method that takes one parameter '(URL)' into a method that takes no parameters and it holds the model URL (also called partial application of functions)
       let adapter = ImageDataPresentationAdapter(loader: { [imageLoader] in
         imageLoader(model.url)
@@ -57,7 +59,19 @@ final class FeedViewAdapter: ResourceView {
       // If we dont care about 'delegate' and 'dataSourcePrefetching' we can use another init() which will internally set mandatory 'dataSource' and others will set as 'nil'
       // adding 'id' with 'Hashable' model will automatically tell UI to redraw that cell if any changes happens to the model. (diffable data source).
       return CellController(id: model, view)
-    })
+    }
+
+    // here we need to 'create' a new 'section' into the cell controllers
+    let loadMore = LoadMoreCellController {
+      // every time we call 'callback' we need to call 'viewModel.loadMore' 'callback'
+      viewModel.loadMore?({ _ in })
+    }
+    // creating a second 'section' which is an array of the 'CellControllers' with only one item 'CellController' where 'dataSource' is 'loadMore'
+    // LoadMoreCellController conforms to 'UITableViewDataSource' thats why we can use it
+    let loadMoreSection = [CellController(id: UUID(), loadMore)]
+
+    // here we separate into sections
+    controller?.display(feed, loadMoreSection)
   }
 }
 

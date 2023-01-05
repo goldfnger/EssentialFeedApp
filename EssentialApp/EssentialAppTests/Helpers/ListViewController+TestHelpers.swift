@@ -125,6 +125,20 @@ extension ListViewController {
     ds?.tableView?(tableView, cancelPrefetchingForRowsAt: [index])
   }
 
+  // when the load more cell will become visible - we can use delegate method 'willDisplay' and since the load more cell is always the last cell of the table that is when it is going to become visible it should load more
+  func simulateLoadMoreFeedAction() {
+    // cell might not exist, because if you can not load more the cell should not be added to the table view
+    // so we can not simulate if we dont have a load more cell
+    // view is basically 'load more action'
+    guard let view = cell(row: 0, section: feedLoadMoreSection) else { return }
+
+    let delegate = tableView.delegate
+    // to separate views into sections exactly you know so we have a section with all the 'feed images' and then we have a section with the 'load more' then you can have a section with some header items etc
+    // in our case we need 'first item 'row 0'' from the 'second section', because 'first section' is the 'feed section'
+    let index = IndexPath(row: 0, section: feedLoadMoreSection)
+    delegate?.tableView?(tableView, willDisplay: view, forRowAt: index)
+  }
+
   func renderedFeedImageData(at index: Int) -> Data? {
     return simulateFeedImageViewVisible(at: index)?.renderedImage
   }
@@ -138,4 +152,5 @@ extension ListViewController {
   }
 
   private var feedImagesSection: Int { 0 }
+  private var feedLoadMoreSection: Int { 1 }
 }

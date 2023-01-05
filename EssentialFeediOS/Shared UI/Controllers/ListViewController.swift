@@ -78,13 +78,15 @@ public final class ListViewController: UITableViewController, UITableViewDataSou
   }
 
   // 1. everytime we get new 'CellController'
-  public func display(_ cellControllers: [CellController]) {
+  public func display(_ sections: [CellController]...) {
     // 2. we create an empty snapshot
     var snapshot = NSDiffableDataSourceSnapshot<Int, CellController>()
-    // 3. we append the new controllers
-    snapshot.appendSections([0])
-    snapshot.appendItems(cellControllers, toSection: 0)
-    // 4. tell data source to apply. 'dataSource' will check what changed using 'Hashable' and only update what is necessary
+    // 3. we append new 'section/s' and 'cellController/s' the new controllers. so for each section we get this section and the cellControllers for that section and now we append any amount of section we want
+    sections.enumerated().forEach { section, cellControllers in
+      snapshot.appendSections([section])
+      snapshot.appendItems(cellControllers, toSection: section)
+    }
+    // 4. tell 'dataSource' to apply. 'dataSource' will check what changed using 'Hashable' and only update what is necessary
     if #available(iOS 15.0, *) {
       dataSource.applySnapshotUsingReloadData(snapshot)
     } else {

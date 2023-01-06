@@ -52,8 +52,6 @@ class FeedUIIntegrationTests: XCTestCase {
     XCTAssertEqual(loader.loadFeedCallCount, 3, "Expected yet another loading request once user initiates another reload")
   }
 
-  // can not understand why the test fails, compared the code from the lecture line by line and to me there is no difference except the fail
-  // lecture bonus #005 time 1:10:42
   func test_loadMoreActions_requestMoreFromLoader() {
       let (sut, loader) = makeSUT()
       sut.loadViewIfNeeded()

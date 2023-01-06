@@ -31,6 +31,14 @@ public struct CellController {
     self.delegate = nil
     self.dataSourcePrefetching = nil
   }
+
+  // for case where 'dataSource' & 'delegate' used (like 'LoadMoreCellController')
+  public init(id: AnyHashable, _ dataSource: UITableViewDataSource & UITableViewDelegate) {
+    self.id = id
+    self.dataSource = dataSource
+    self.delegate = dataSource
+    self.dataSourcePrefetching = nil
+  }
 }
 
 // we are making 'CellController' as 'Hashable' & 'Equatable' to be able to compare which data has changed or not to eliminate necessary to reload whole table view, only what has changed

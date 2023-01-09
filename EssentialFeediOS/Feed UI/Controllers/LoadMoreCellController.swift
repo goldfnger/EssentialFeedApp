@@ -28,6 +28,15 @@ public class LoadMoreCellController: NSObject, UITableViewDataSource, UITableVie
 
   // we removed 'cell' next to willDisplay because we are not using this one, but 'LoadMoreCell'
   public func tableView(_ tableView: UITableView, willDisplay: UITableViewCell, forRowAt indexPath: IndexPath) {
+    reloadIfNeeded()
+  }
+
+  // when user tap load more error we should call 'callback' and reload
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    reloadIfNeeded()
+  }
+
+  private func reloadIfNeeded() {
     // we should call 'callback' only if we are not loading. otherwise callback will be triggered again and again even if it is already loading a request - it can use too many resources in the device and in the server
     guard !cell.isLoading else { return }
 

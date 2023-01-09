@@ -16,6 +16,7 @@ final class FeedViewAdapter: ResourceView {
   private let selection: (FeedImage) -> Void
 
   private typealias ImageDataPresentationAdapter = LoadResourcePresentationAdapter<Data, WeakRefVirtualProxy<FeedImageCellController>>
+  private typealias LoadMorePresentationAdapter = LoadResourcePresentationAdapter<Paginated<FeedImage>, FeedViewAdapter>
 
   init(controller: ListViewController, imageLoader: @escaping (URL) -> FeedImageDataLoader.Publisher, selection: @escaping (FeedImage) -> Void) {
     self.controller = controller
@@ -44,6 +45,7 @@ final class FeedViewAdapter: ResourceView {
           selection(model)
         })
 
+      // we are using view for all 'resourceView, loadingView, errorView' because 'view' is implementing all 'ResourceView, ResourceLoadingView, ResourceErrorView' protocols (if it would not then we would have to create something like 'loadMore')
       adapter.presenter = LoadResourcePresenter(
         resourceView: WeakRefVirtualProxy(view),
         loadingView: WeakRefVirtualProxy(view),
@@ -61,11 +63,37 @@ final class FeedViewAdapter: ResourceView {
       return CellController(id: model, view)
     }
 
-    // here we need to 'create' a new 'section' into the cell controllers
+    // if we have 'loadMorePublisher' then we create 'loadMoreAdapter' and we create our 'presenter'
+    guard let loadMorePublisher = viewModel.loadMorePublisher else {
+      // we need complete with the current feed if we dont have load more (we do not append the load more section)
+      controller?.display(feed)
+      return
+    }
+
+    // in case confusing worth to re-watch live#002
+    let loadMoreAdapter = LoadMorePresentationAdapter(loader: loadMorePublisher)
+
+    /*
     let loadMore = LoadMoreCellController {
       // every time we call 'callback' we need to call 'viewModel.loadMore' 'callback'
       viewModel.loadMore?({ _ in })
     }
+     */
+    // here we need to 'create' a new 'section' into the cell controllers
+    // now here we should use the adapter 'loadResource' method instead of calling 'loadMore' every time
+    // because the 'loadResource' in the adapter is the one that we will call the 'loadMorePublisher' and handle all the state transitions with the presenter
+    let loadMore = LoadMoreCellController(callback: loadMoreAdapter.loadResource)
+
+    loadMoreAdapter.presenter = LoadResourcePresenter(
+      // because in 'loadMoreAdapter' as view set 'FeedViewAdapter' which is the same type that is creating so if we are loading more we can reuse the current existing view (FeedViewAdapter) and just pass self.
+      resourceView: self,
+      // 'loadingView' is the 'LoadMoreCellController'
+      loadingView: WeakRefVirtualProxy(loadMore),
+      // 'errorView' is the'LoadMoreCellController'
+      errorView: WeakRefVirtualProxy(loadMore),
+      // actually we dont need a mapper, so just pass the result forward
+      mapper: { $0 })
+
     // creating a second 'section' which is an array of the 'CellControllers' with only one item 'CellController' where 'dataSource' is 'loadMore'
     // LoadMoreCellController conforms to 'UITableViewDataSource' thats why we can use it
     let loadMoreSection = [CellController(id: UUID(), loadMore)]

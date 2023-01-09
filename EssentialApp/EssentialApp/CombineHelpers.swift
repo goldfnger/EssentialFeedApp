@@ -9,6 +9,20 @@ import Foundation
 import Combine
 import EssentialFeed
 
+// this going to convert this closure type ('(Result<Self, Error>) -> Void') into a 'Publisher'
+// this is the 'bridging' from the 'closure' to 'publisher'
+public extension Paginated {
+  var loadMorePublisher: (() -> AnyPublisher<Self, Error>)? {
+    // but only if we have 'loadMore' closure
+    guard let loadMore = loadMore else { return nil }
+
+    return {
+      Deferred {
+        Future(loadMore)
+      }.eraseToAnyPublisher()
+    }
+  }
+}
 
 public extension HTTPClient {
   typealias Publisher = AnyPublisher<(Data, HTTPURLResponse), Error>

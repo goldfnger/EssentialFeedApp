@@ -26,7 +26,11 @@ public class LoadMoreCellController: NSObject, UITableViewDataSource, UITableVie
     cell
   }
 
-  public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+  // we removed 'cell' next to willDisplay because we are not using this one, but 'LoadMoreCell'
+  public func tableView(_ tableView: UITableView, willDisplay: UITableViewCell, forRowAt indexPath: IndexPath) {
+    // we should call 'callback' only if we are not loading. otherwise callback will be triggered again and again even if it is already loading a request - it can use too many resources in the device and in the server
+    guard !cell.isLoading else { return }
+
     // every time the cell will be displayed it will call the 'callback'
     callback()
   }

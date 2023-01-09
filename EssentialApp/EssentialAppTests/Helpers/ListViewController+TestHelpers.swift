@@ -139,6 +139,16 @@ extension ListViewController {
     delegate?.tableView?(tableView, willDisplay: view, forRowAt: index)
   }
 
+  // we are showing the load more feed indicator
+  var isShowingLoadMoreFeedIndicator: Bool {
+    // if the cell exists and its loading
+    return loadMoreFeedCell()?.isLoading == true
+  }
+
+  private func loadMoreFeedCell() -> LoadMoreCell? {
+    cell(row: 0, section: feedLoadMoreSection) as? LoadMoreCell
+  }
+
   func renderedFeedImageData(at index: Int) -> Data? {
     return simulateFeedImageViewVisible(at: index)?.renderedImage
   }

@@ -10,8 +10,31 @@ import Combine
 import EssentialFeed
 
 // this going to convert this closure type ('(Result<Self, Error>) -> Void') into a 'Publisher'
-// this is the 'bridging' from the 'closure' to 'publisher'
+// this is the 'bridging' from the 'closure' to 'publisher' and vice versa
+// bridging is not needed if our modules are coupled with combine, otherwise we create a bridge and we decouple from Combine (it is a choice)
 public extension Paginated {
+  // converting 'publisher' into 'closure'
+  init(items: [Item], loadMorePublisher: (() -> AnyPublisher<Self, Error>)?) {
+    // 'loadMore' needs a 'closure' optional will only exist if we have a load more otherwise it is 'nil', so we can just map this 'optional' that would give us 'publisher' closure
+    self.init(items: items, loadMore: loadMorePublisher.map { publisher in
+      // and now we need to return a 'closure' loadMore that takes a 'completion' (which is 'closure' in 'Paginated<Item> loadMore')
+      // so in this case everytime this closure is invoked with a completion block
+      return { completion in
+        // we will call 'publisher' 'closure' that will return a 'publisher' and then we can subscribe to the 'publisher'
+        // using 'Subscribers.Sink()' instead of '.sink()' because this way 'Combine' will handle the life cycle without 'Cancellables' so we dont need to hold the cancellable for this subscription. subscription will be alive until it completes
+        publisher().subscribe(Subscribers.Sink(receiveCompletion: { result in
+          // completion may not be failure, could be just a completed successfully so we need to unwrap
+          if case let .failure(error) = result {
+            completion(.failure(error))
+          }
+        }, receiveValue: { result in
+          completion(.success(result))
+        }))
+      }
+    })
+  }
+
+  // 'converting' closure into 'publisher'
   var loadMorePublisher: (() -> AnyPublisher<Self, Error>)? {
     // but only if we have 'loadMore' closure
     guard let loadMore = loadMore else { return nil }

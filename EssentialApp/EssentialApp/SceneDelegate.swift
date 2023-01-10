@@ -96,10 +96,36 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       .caching(to: localFeedLoader) // [     caching     ]
       .fallback(to: localFeedLoader.loadPublisher)
     // we get an array of items and we just wrap it in a paginated which does nothing
-      .map {
-        Paginated(items: $0)
+      .map { items in
+        // only create this 'loadMorePublisher' if have a last item in the items
+        // 1. we load the first items
+        Paginated(items: items, loadMorePublisher:
+                    self.makeRemoteLoadMoreLoader(items: items, last: items.last))
       }
       .eraseToAnyPublisher()
+  }
+
+  // we need to call this method recursively
+  private func makeRemoteLoadMoreLoader(items: [FeedImage], last: FeedImage?) -> (() -> AnyPublisher<Paginated<FeedImage>, Error>)? {
+    last.map { lastItem in
+      let url = FeedEndpoint.get(after: lastItem).url(baseURL: baseURL)
+
+      // 2. and we load again
+      return  { [httpClient] in
+        httpClient
+          .getPublisher(url: url)
+          .tryMap(FeedItemsMapper.map)
+          .map { newItems in
+            // we append the 'lastItems(items)' with the 'newItems'
+            // and keep appending all the elements until 'newItems' is empty which means we reached the end of the pagination
+            let allItems = items + newItems
+            // and here we calling recursively the same function
+            return Paginated(items: allItems,
+                             // when loading a new page last items is a 'newItems.last', because lastItem can be empty and if newItems is empty it means we reached the end
+                             loadMorePublisher: self.makeRemoteLoadMoreLoader(items: allItems, last: newItems.last))
+          }.eraseToAnyPublisher()
+      }
+    }
   }
 
   private func makeLocalImageLoaderWithRemoteFallback(url: URL) -> FeedImageDataLoader.Publisher {

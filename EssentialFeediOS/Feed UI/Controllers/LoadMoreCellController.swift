@@ -13,6 +13,7 @@ public class LoadMoreCellController: NSObject, UITableViewDataSource, UITableVie
   // we dont need to reuse this cell because it is only one cell in the view
   private let cell = LoadMoreCell()
   private let callback: () -> Void
+  private var offsetObserver: NSKeyValueObservation?
 
   public init(callback: @escaping () -> Void) {
     self.callback = callback
@@ -30,6 +31,20 @@ public class LoadMoreCellController: NSObject, UITableViewDataSource, UITableVie
   // we removed 'cell' next to willDisplay because we are not using this one, but 'LoadMoreCell'
   public func tableView(_ tableView: UITableView, willDisplay: UITableViewCell, forRowAt indexPath: IndexPath) {
     reloadIfNeeded()
+
+    // while the cell is visible every time you drag it will reload (without this logic reload would be 'triggered' only if 'new cell' is appeared, not when 'user drag')
+    // we need to hold a reference otherwise it is the deallocated immediately
+    offsetObserver = tableView.observe(\.contentOffset, options: .new) { [weak self] tableView, _ in // 'tableView' is the value we are observing
+      // if 'tableView' is not 'dragging' and cell is not loading(reloadIfNeeded) we do not do anything
+      guard tableView.isDragging else { return }
+
+      // otherwise we call the 'callback'
+      self?.reloadIfNeeded()
+    }
+  }
+
+  public func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+    offsetObserver = nil
   }
 
   // when user tap load more error we should call 'callback' and reload

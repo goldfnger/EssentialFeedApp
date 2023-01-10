@@ -127,16 +127,29 @@ extension Publisher {
   }
 }
 
-extension Publisher where Output == [FeedImage] {
-  func caching(to cache: FeedCache) -> AnyPublisher<Output, Failure> {
+extension Publisher {
+  // to cache 'FeedImage' items
+  func caching(to cache: FeedCache) -> AnyPublisher<Output, Failure>  where Output == [FeedImage] {
     handleEvents(receiveOutput: cache.saveIgnoringResult).eraseToAnyPublisher()
   }
+
+  // to cache 'Paginated' 'FeedImage' pages
+  func caching(to cache: FeedCache) -> AnyPublisher<Output, Failure>  where Output == Paginated<FeedImage> {
+    handleEvents(receiveOutput: cache.saveIgnoringResult).eraseToAnyPublisher()
+  }
+
 }
 
 private extension FeedCache {
   // we dont care about result
+  // to cache 'FeedImage' items
   func saveIgnoringResult(_ feed: [FeedImage]) {
     save(feed) { _ in }
+  }
+
+  // to cache 'Paginated' 'FeedImage' ie 'pages'
+  func saveIgnoringResult(_ page: Paginated<FeedImage>) {
+    saveIgnoringResult(page.items)
   }
 }
 

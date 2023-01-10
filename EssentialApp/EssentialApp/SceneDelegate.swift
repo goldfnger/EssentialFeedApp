@@ -110,8 +110,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     last.map { lastItem in
       let url = FeedEndpoint.get(after: lastItem).url(baseURL: baseURL)
 
-      // 2. and we load again
-      return  { [httpClient] in
+      // 2. and we load again. [capture needed resources]
+      return  { [httpClient, localFeedLoader] in
         httpClient
           .getPublisher(url: url)
           .tryMap(FeedItemsMapper.map)
@@ -123,7 +123,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             return Paginated(items: allItems,
                              // when loading a new page last items is a 'newItems.last', because lastItem can be empty and if newItems is empty it means we reached the end
                              loadMorePublisher: self.makeRemoteLoadMoreLoader(items: allItems, last: newItems.last))
-          }.eraseToAnyPublisher()
+          }
+          .caching(to: localFeedLoader)
       }
     }
   }

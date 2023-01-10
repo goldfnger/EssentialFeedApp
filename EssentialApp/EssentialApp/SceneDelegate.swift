@@ -104,6 +104,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         (items + newItems, newItems.last)
         // then makes a page
       }.map(makePage)
+    // only for testing purpose
+      /*.delay(for: 2, scheduler: DispatchQueue.main)*/ // thats how we can test and make sure in builded app that spinner is shown when new page is loading
+      /*.flatMap({ _ in
+        Fail(error: NSError())
+      })*/ // thats how we can test and make sure that error appears if loading is failed
       .caching(to: localFeedLoader)
   }
 

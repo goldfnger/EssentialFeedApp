@@ -84,49 +84,56 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   }
 
   private func makeRemoteFeedLoaderWithLocalFallBack() -> AnyPublisher<Paginated<FeedImage>, Error> {
-    let url = FeedEndpoint.get().url(baseURL: baseURL)
-
-    // wrapping the load function into Combine
-    // [ side-effect ]
-    return httpClient
-      .getPublisher(url: url) // [ network request ]
-    // -pure function-
-      .tryMap(FeedItemsMapper.map)  // -     mapping     -
+    makeRemoteFeedLoader()
     // [ side-effect ]
       .caching(to: localFeedLoader) // [     caching     ]
       .fallback(to: localFeedLoader.loadPublisher)
-    // we get an array of items and we just wrap it in a paginated which does nothing
-      .map { items in
-        // only create this 'loadMorePublisher' if have a last item in the items
-        // 1. we load the first items
-        Paginated(items: items, loadMorePublisher:
-                    self.makeRemoteLoadMoreLoader(items: items, last: items.last))
-      }
+      .map(makeFirstPage)
       .eraseToAnyPublisher()
   }
 
   // we need to call this method recursively
-  private func makeRemoteLoadMoreLoader(items: [FeedImage], last: FeedImage?) -> (() -> AnyPublisher<Paginated<FeedImage>, Error>)? {
-    last.map { lastItem in
-      let url = FeedEndpoint.get(after: lastItem).url(baseURL: baseURL)
+  private func makeRemoteLoadMoreLoader(items: [FeedImage], last: FeedImage?) -> AnyPublisher<Paginated<FeedImage>, Error> {
+    // makeRemoteLoadMoreLoader it creates a remote feed loader after the last item
+    makeRemoteFeedLoader(after: last)
+    // it gets the new items
+      .map { newItems in
+        // and combine
+        // we append the 'lastItems(items)' with the 'newItems'
+        // and keep appending all the elements until 'newItems' is empty which means we reached the end of the pagination
+        (items + newItems, newItems.last)
+        // then makes a page
+      }.map(makePage)
+      .caching(to: localFeedLoader)
+  }
 
-      // 2. and we load again. [capture needed resources]
-      return  { [httpClient, localFeedLoader] in
-        httpClient
-          .getPublisher(url: url)
-          .tryMap(FeedItemsMapper.map)
-          .map { newItems in
-            // we append the 'lastItems(items)' with the 'newItems'
-            // and keep appending all the elements until 'newItems' is empty which means we reached the end of the pagination
-            let allItems = items + newItems
-            // and here we calling recursively the same function
-            return Paginated(items: allItems,
-                             // when loading a new page last items is a 'newItems.last', because lastItem can be empty and if newItems is empty it means we reached the end
-                             loadMorePublisher: self.makeRemoteLoadMoreLoader(items: allItems, last: newItems.last))
-          }
-          .caching(to: localFeedLoader)
-      }
-    }
+  // we need to call this method recursively
+  private func makeRemoteFeedLoader(after: FeedImage? = nil) -> AnyPublisher<[FeedImage], Error> {
+    let url = FeedEndpoint.get(after: after).url(baseURL: baseURL)
+
+    // wrapping the load function into Combine
+    // [ side-effect ]
+    // 2. and we load again.
+    return httpClient
+      .getPublisher(url: url) // [ network request ]
+    // -pure function-
+      .tryMap(FeedItemsMapper.map)  // -     mapping     -
+      .eraseToAnyPublisher()
+  }
+
+  private func makeFirstPage(items: [FeedImage]) -> Paginated<FeedImage> {
+    makePage(items: items, last: items.last)
+  }
+
+  private func makePage(items: [FeedImage], last: FeedImage?)-> Paginated<FeedImage> {
+    // only create this 'loadMorePublisher' if have a last item in the items
+    // 1. we load the first items
+    // and here we calling recursively the same function
+    Paginated(items: items,
+              // when loading a new page last items is a 'newItems.last', because 'lastItem' can be empty and if 'newItems' is empty it means we reached the end
+              loadMorePublisher: last.map { last in
+      { self.makeRemoteLoadMoreLoader(items: items, last: last) }
+    })
   }
 
   private func makeLocalImageLoaderWithRemoteFallback(url: URL) -> FeedImageDataLoader.Publisher {

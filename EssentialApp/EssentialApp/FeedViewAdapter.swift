@@ -50,12 +50,7 @@ final class FeedViewAdapter: ResourceView {
         resourceView: WeakRefVirtualProxy(view),
         loadingView: WeakRefVirtualProxy(view),
         errorView: WeakRefVirtualProxy(view),
-        mapper: { data in
-          guard let image = UIImage(data: data) else {
-            throw InvalidImageData()
-          }
-          return image
-        })
+        mapper: UIImage.tryMake)
 
       // because 'CellController' now is a struct and because 'FeedImageCellController' implements all 3 protocols(defined in 'CellController') we can pass simply one 'view' and init() will set all 3 sources internally.
       // If we dont care about 'delegate' and 'dataSourcePrefetching' we can use another init() which will internally set mandatory 'dataSource' and others will set as 'nil'
@@ -103,4 +98,13 @@ final class FeedViewAdapter: ResourceView {
   }
 }
 
-private struct InvalidImageData: Error {}
+extension UIImage {
+  struct InvalidImageData: Error {}
+
+  static func tryMake(data: Data) throws -> UIImage {
+    guard let image = UIImage(data: data) else {
+      throw InvalidImageData()
+    }
+    return image
+  }
+}

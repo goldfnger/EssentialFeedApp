@@ -14,11 +14,14 @@ final class FeedViewAdapter: ResourceView {
   private weak var controller: ListViewController?
   private let imageLoader: (URL) -> FeedImageDataLoader.Publisher
   private let selection: (FeedImage) -> Void
+  // 'lookup table 'for given images 'FeedImage' is the 'key' and 'CellController' is the 'value' [model: controller]
+  private let currentFeed: [FeedImage: CellController]
 
   private typealias ImageDataPresentationAdapter = LoadResourcePresentationAdapter<Data, WeakRefVirtualProxy<FeedImageCellController>>
   private typealias LoadMorePresentationAdapter = LoadResourcePresentationAdapter<Paginated<FeedImage>, FeedViewAdapter>
 
-  init(controller: ListViewController, imageLoader: @escaping (URL) -> FeedImageDataLoader.Publisher, selection: @escaping (FeedImage) -> Void) {
+  init(currentFeed: [FeedImage: CellController] = [:], controller: ListViewController?, imageLoader: @escaping (URL) -> FeedImageDataLoader.Publisher, selection: @escaping (FeedImage) -> Void) {
+    self.currentFeed = currentFeed
     self.controller = controller
     self.imageLoader = imageLoader
     self.selection = selection
@@ -26,8 +29,19 @@ final class FeedViewAdapter: ResourceView {
 
   // now should use Paginated<FeedImage> where we can access whole list of 'FeedImage' 'items'
   func display(_ viewModel: Paginated<FeedImage>) {
+    // if we dont have a 'controller' then we can not present a page
+    guard let controller = controller else { return }
+
+    // mutable version of'currentFeed' and later 'populate' it with 'new' cell controllers
+    var currentFeed = self.currentFeed
     // here we have an array of 'CellController's for the 'feed' which is the first section(0) 'feed'
     let feed: [CellController] = viewModel.items.map { model in
+      // we are check 'lookup table' for 'given' model , if we have a value for it we dont need to recreate it
+      // if we could not fine in the cache 'lookup table'
+      if let controller = currentFeed[model] {
+        return controller
+      }
+
       // pass a custom closure 'loader: {}' that calls the image loader with the model URL - we are adapting the image loader method that takes one parameter '(URL)' into a method that takes no parameters and it holds the model URL (also called partial application of functions)
       let adapter = ImageDataPresentationAdapter(loader: { [imageLoader] in
         imageLoader(model.url)
@@ -55,13 +69,18 @@ final class FeedViewAdapter: ResourceView {
       // because 'CellController' now is a struct and because 'FeedImageCellController' implements all 3 protocols(defined in 'CellController') we can pass simply one 'view' and init() will set all 3 sources internally.
       // If we dont care about 'delegate' and 'dataSourcePrefetching' we can use another init() which will internally set mandatory 'dataSource' and others will set as 'nil'
       // adding 'id' with 'Hashable' model will automatically tell UI to redraw that cell if any changes happens to the model. (diffable data source).
-      return CellController(id: model, view)
+      // we will create a new one 'controller'.
+      let controller = CellController(id: model, view)
+      // 'append' controller to the 'cache'('lookup table') for the 'given' model
+      currentFeed[model] = controller
+      // and return it .so next time we 'lookup' the 'currentFeed' it be there.
+      return controller
     }
 
     // if we have 'loadMorePublisher' then we create 'loadMoreAdapter' and we create our 'presenter'
     guard let loadMorePublisher = viewModel.loadMorePublisher else {
       // we need complete with the current feed if we dont have load more (we do not append the load more section)
-      controller?.display(feed)
+      controller.display(feed)
       return
     }
 
@@ -80,8 +99,15 @@ final class FeedViewAdapter: ResourceView {
     let loadMore = LoadMoreCellController(callback: loadMoreAdapter.loadResource)
 
     loadMoreAdapter.presenter = LoadResourcePresenter(
-      // because in 'loadMoreAdapter' as view set 'FeedViewAdapter' which is the same type that is creating so if we are loading more we can reuse the current existing view (FeedViewAdapter) and just pass self.
-      resourceView: self,
+      // OLD- because in 'loadMoreAdapter' as view set 'FeedViewAdapter' which is the same type that is creating so if we are loading more we can reuse the current existing view (FeedViewAdapter) and just pass self.
+      // NEW- when we are loading new page now instead of using 'self' as the resource view we can create a new 'FeedViewAdapter' with a 'currentFeed'
+      resourceView: FeedViewAdapter(
+        // we keep passing forward 'currentFeed' that we just 'populated'
+        currentFeed: currentFeed,
+        controller: controller,
+        imageLoader: imageLoader,
+        selection: selection
+      ),
       // 'loadingView' is the 'LoadMoreCellController'
       loadingView: WeakRefVirtualProxy(loadMore),
       // 'errorView' is the'LoadMoreCellController'
@@ -94,7 +120,7 @@ final class FeedViewAdapter: ResourceView {
     let loadMoreSection = [CellController(id: UUID(), loadMore)]
 
     // here we separate into sections
-    controller?.display(feed, loadMoreSection)
+    controller.display(feed, loadMoreSection)
   }
 }
 

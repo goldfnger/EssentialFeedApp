@@ -454,10 +454,17 @@ class FeedUIIntegrationTests: XCTestCase {
     XCTAssertEqual(loader.loadedImageURLs, [image.url, image.url], "Expected second request when visible after previous complete")
 
     // becomes not visible, should cancel request
-    // become visible again, should load the third reuqest
+    // become visible again, should load the third request
     sut.simulateFeedImageViewNotVisible(at: 0)
     sut.simulateFeedImageViewVisible(at: 0)
     XCTAssertEqual(loader.loadedImageURLs, [image.url, image.url, image.url], "Expected third request when visible after canceling previous complete")
+
+    // start loading a new page
+    sut.simulateLoadMoreFeedAction()
+    // we create the cell controllers for the new item and we start loading again
+    loader.completeLoadMore(with: [image, makeImage()])
+    sut.simulateFeedImageViewVisible(at: 0)
+    XCTAssertEqual(loader.loadedImageURLs, [image.url, image.url, image.url], "Expected no request until previous completes")
   }
 
   //MARK: - Load More Tests

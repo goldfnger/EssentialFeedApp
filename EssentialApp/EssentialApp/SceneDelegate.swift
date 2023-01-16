@@ -171,15 +171,93 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   }
 
   private func makeLocalImageLoaderWithRemoteFallback(url: URL) -> FeedImageDataLoader.Publisher {
+    // 3. we can decorate specific instances, for example if we want to monitor only image request
+    // when we loading an image we also create decorated instance
+//    let client = HTTPClientProfilingDecorator(decoratee: httpClient, logger: logger) // 4
     let localImageLoader = LocalFeedImageDataLoader(store: store)
 
     return localImageLoader
       .loadImageDataPublisher(from: url)
-      .fallback(to: { [httpClient] in
+      .logCacheMisses(url: url, logger: logger)
+//      .fallback(to: { [logger] in // 4
+      .fallback(to: { [httpClient, logger] in
+        // 4. we can use 'logger' into 'Publishers' chain with '.handleEvents' and we dont need to decorate the client anymore
+//        var startTime = CACurrentMediaTime() // 4
+
         httpClient
           .getPublisher(url: url)
+          .logErrors(url: url, logger: logger)
+          .logElapsedTime(url: url, logger: logger)
           .tryMap(FeedImageDataMapper.map)
           .caching(to: localImageLoader, using: url)
       })
   }
 }
+
+// Combine way to inject logging(or any other) behaviour into the chain
+extension Publisher {
+  func logCacheMisses(url: URL, logger: Logger) -> AnyPublisher<Output, Failure> {
+     return handleEvents(
+      receiveCompletion: { result in
+      if case .failure = result {
+        logger.trace("Cache miss for url: \(url)")
+      }
+     }).eraseToAnyPublisher()
+  }
+
+  func logErrors(url: URL, logger: Logger) -> AnyPublisher<Output, Failure> {
+     return handleEvents(
+      receiveCompletion: { result in
+      if case let .failure(error) = result {
+        logger.trace("Failed to load url: \(url) with error: \(error.localizedDescription)")
+      }
+     }).eraseToAnyPublisher()
+  }
+
+  func logElapsedTime(url: URL, logger: Logger) -> AnyPublisher<Output, Failure> {
+    var startTime = CACurrentMediaTime()
+
+    return handleEvents(
+      receiveSubscription: { _ in
+        logger.trace("Started loading url: \(url)")
+        startTime = CACurrentMediaTime()
+      },
+      receiveCompletion: { result in
+        let elapsed = CACurrentMediaTime() - startTime
+        logger.trace("Finished loading url: \(url) in \(elapsed) seconds")
+      }).eraseToAnyPublisher()
+  }
+}
+
+
+// 4
+/*
+// with 'decorator pattern' we can 'inject' the 'logging' by 'decorating' an HTTPClient
+// decorator(HTTPClientProfilingDecorator) implements same interface as decoratee(HTTPClient)
+private class HTTPClientProfilingDecorator: HTTPClient {
+  private let decoratee: HTTPClient
+  private let logger: Logger
+
+  public init(decoratee: HTTPClient, logger: Logger) {
+    self.decoratee = decoratee
+    self.logger = logger
+  }
+
+  func get(from url: URL, completion: @escaping (HTTPClient.Result) -> Void) -> HTTPClientTask {
+    // 2. now we 'can add' more 'behaviour' to this 'class' for example we 'can add logging'
+    logger.trace("Started loading url: \(url)")
+
+    // 1. simply 'forwarding' the 'message' to the 'decoratee' and doing 'nothing'
+    let startTime = CACurrentMediaTime()
+    return decoratee.get(from: url) { [logger] result in
+      if case let .failure(error) = result {
+        logger.trace("Failed to load url: \(url) with error: \(error.localizedDescription)")
+      }
+      let elapsed = CACurrentMediaTime() - startTime
+      logger.trace("Finished loading url: \(url) in \(elapsed) seconds")
+
+      completion(result)
+    }
+  }
+}
+*/

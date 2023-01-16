@@ -35,6 +35,9 @@ extension FeedUIIntegrationTests {
       feedRequests[index].send(Paginated(items: feed, loadMorePublisher: { [weak self] in
         self?.loadMorePublisher() ?? Empty().eraseToAnyPublisher()
       }))
+      // in our 'test spy' we 'never complete' our 'publishers', we only send 'values' to it. so the way publishers work we can send multiple values to a publisher until it completes or until u got a failure.
+      // so as soon as we send a value to our publisher with complete loading we can also send a completion to tell it we finished.
+      feedRequests[index].send(completion: .finished)
     }
 
     //MARK: - LoadMoreFeedLoader

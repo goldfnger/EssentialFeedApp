@@ -22,12 +22,14 @@ extension LocalFeedImageDataLoader: FeedImageDataCache {
     case failed
   }
 
+  // if we have a sync APIs they will never be allocated during an implementation or during an action. it cant happen.
   public func save(_ data: Data, for url: URL, completion: @escaping (SaveResult) -> Void) {
-    store.insert(data, for: url) { [weak self] result in
-      guard self != nil else { return }
-      
-      completion(result.mapError { _ in SaveError.failed })
-    }
+    // now instead of calling these async APIs waiting for the completion and calling the completion block
+    // we can do it synchronously we wrapping the result 'SaveResult'
+    completion(SaveResult {
+      // and calling the sync API without the completion block
+      try store.insert(data, for: url)
+    }.mapError { _ in SaveError.failed })
   }
 }
 

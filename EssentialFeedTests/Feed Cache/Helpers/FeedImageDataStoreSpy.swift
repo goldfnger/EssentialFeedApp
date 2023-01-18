@@ -16,11 +16,16 @@ class FeedImageDataStoreSpy: FeedImageDataStore {
 
   private(set) var receivedMessages = [Message]()
   private var retrievalCompletions = [(FeedImageDataStore.RetrievalResult) -> Void]()
-  private var insertionCompletions = [(FeedImageDataStore.InsertionResult) -> Void]()
+  // stub insertionResult of type Void or Error
+  private var insertionResult: Result<Void, Error>?
 
-  func insert(_ data: Data, for url: URL, completion: @escaping (InsertionResult) -> Void) {
+  // synchronous. in sync API we need to Stub value before the method is invoked! because we need to return a value immediately!
+  func insert(_ data: Data, for url: URL) throws {
+    // return synchronously immediately so we need to stub this result before invoking the method
     receivedMessages.append(.insert(data: data, for: url))
-    insertionCompletions.append(completion)
+    // we need instead of 'capturing' the 'completion blocks' we need to 'stub' the 'result' 'upfront', because we need to return something either error or void.
+    // we call 'try' 'insertionResult' 'get', if there is an error it throws, otherwise it return void
+    try insertionResult?.get()
   }
 
   func retrieve(dataForURL url: URL, completion: @escaping (RetrievalResult) -> Void) {
@@ -37,10 +42,12 @@ class FeedImageDataStoreSpy: FeedImageDataStore {
   }
 
   func completeInsertion(with error: Error, at index: Int = 0) {
-    insertionCompletions[index](.failure(error))
+    // just stub
+    insertionResult = .failure(error)
   }
 
   func completeInsertionSuccessfully(at index: Int = 0) {
-    insertionCompletions[index](.success(()))
+    // just stub
+    insertionResult = .success(())
   }
 }

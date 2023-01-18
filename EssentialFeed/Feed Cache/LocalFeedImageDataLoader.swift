@@ -16,20 +16,20 @@ public final class LocalFeedImageDataLoader {
 }
 
 extension LocalFeedImageDataLoader: FeedImageDataCache {
-  public typealias SaveResult = FeedImageDataCache.Result
-
   public enum SaveError: Error {
     case failed
   }
 
   // if we have a sync APIs they will never be allocated during an implementation or during an action. it cant happen.
-  public func save(_ data: Data, for url: URL, completion: @escaping (SaveResult) -> Void) {
+  public func save(_ data: Data, for url: URL) throws {
     // now instead of calling these async APIs waiting for the completion and calling the completion block
-    // we can do it synchronously we wrapping the result 'SaveResult'
-    completion(SaveResult {
+    // we can do it synchronously using do catch
+    do {
       // and calling the sync API without the completion block
       try store.insert(data, for: url)
-    }.mapError { _ in SaveError.failed })
+    } catch {
+      throw SaveError.failed
+    }
   }
 }
 

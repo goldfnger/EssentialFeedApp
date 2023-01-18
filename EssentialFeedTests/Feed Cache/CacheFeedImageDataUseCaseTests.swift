@@ -21,7 +21,8 @@ class CacheFeedImageDataUseCaseTests: XCTestCase {
     let url = anyURL()
     let data = anyData()
 
-    sut.save(data, for: url) { _ in }
+    // we dont care about the result, because we are testing it in other tests
+    try? sut.save(data, for: url)
 
     XCTAssertEqual(store.receivedMessages, [.insert(data: data, for: url)])
   }
@@ -56,32 +57,26 @@ class CacheFeedImageDataUseCaseTests: XCTestCase {
   }
 
 
-  private func failed() -> LocalFeedImageDataLoader.SaveResult {
+  private func failed() -> Result<Void, Error> {
     return .failure(LocalFeedImageDataLoader.SaveError.failed)
   }
 
-  private func expect(_ sut: LocalFeedImageDataLoader, toCompleteWith expectedResult: LocalFeedImageDataLoader.SaveResult, when action: () -> Void, file: StaticString = #file, line: UInt = #line) {
-    let exp = expectation(description: "Wait for load completion")
-
+  private func expect(_ sut: LocalFeedImageDataLoader, toCompleteWith expectedResult: Result<Void, Error>, when action: () -> Void, file: StaticString = #file, line: UInt = #line) {
     // while refactoring to Sync API, now we need to 'first' setup the 'stub' and 'then' call the 'method' below
     action()
 
-    sut.save(anyData(), for: anyURL()) { receivedResult in
-      switch (receivedResult, expectedResult) {
-      case (.success, .success):
-        break
+    let receivedResult = Result { try sut.save(anyData(), for: anyURL()) }
 
-      case (.failure(let receivedError as LocalFeedImageDataLoader.SaveError),
+    switch (receivedResult, expectedResult) {
+    case (.success, .success):
+      break
+
+    case (.failure(let receivedError as LocalFeedImageDataLoader.SaveError),
           .failure(let expectedError as LocalFeedImageDataLoader.SaveError)):
-        XCTAssertEqual(receivedError, expectedError, file: file, line: line)
+      XCTAssertEqual(receivedError, expectedError, file: file, line: line)
 
-      default:
-        XCTFail("Expected result \(expectedResult), got \(receivedResult) instead", file: file, line: line)
-      }
-
-      exp.fulfill()
+    default:
+      XCTFail("Expected result \(expectedResult), got \(receivedResult) instead", file: file, line: line)
     }
-
-    wait(for: [exp], timeout: 1.0)
   }
 }

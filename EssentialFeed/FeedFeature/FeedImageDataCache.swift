@@ -8,7 +8,6 @@
 import Foundation
 
 public protocol FeedImageDataCache {
-  typealias Result = Swift.Result<Void, Error>
-
-  func save(_ data: Data, for url: URL, completion: @escaping (Result) -> Void)
+  // now it is synchronous. it either return 'Void' or 'throw an Error', thats why instead of 'completion block' we use 'throws' and remove previous 'Result typealias'
+  func save(_ data: Data, for url: URL) throws
 }

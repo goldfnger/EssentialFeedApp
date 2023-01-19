@@ -70,17 +70,14 @@ public extension FeedImageDataLoader {
   typealias Publisher = AnyPublisher<Data, Error>
 
   func loadImageDataPublisher(from url: URL) -> Publisher {
-    var task: FeedImageDataLoaderTask?
-
     return Deferred {
       Future { completion in
         // hold reference to task
-        task = self.loadImageData(from: url, completion: completion)
+        completion(Result {
+          try self.loadImageData(from: url)
+        })
       }
     }
-    // and if we receive a cancel event - we cancel the task
-    // we are using '.handleEvents' to inject a side-effect into the chain (here side-effect if there is a cancel event - cancel the running task)
-    .handleEvents(receiveCancel: { task?.cancel() })
     .eraseToAnyPublisher()
   }
 }

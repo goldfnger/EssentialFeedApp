@@ -22,14 +22,9 @@ class NullStore: FeedStore & FeedImageDataStore {
 
   func retrieve(completion: @escaping RetrievalCompletions) {
     completion(.success(.none))
-
   }
 
-  func insert(_ data: Data, for url: URL, completion: @escaping (InsertionResult) -> Void) {
-    completion(.success(()))
-  }
+  func insert(_ data: Data, for url: URL) throws {}
 
-  func retrieve(dataForURL url: URL, completion: @escaping (FeedImageDataStore.RetrievalResult) -> Void) {
-    completion(.success(.none))
-  }
+  func retrieve(dataForURL url: URL) throws -> Data? { .none }
 }

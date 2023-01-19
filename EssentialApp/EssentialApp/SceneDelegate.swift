@@ -14,6 +14,13 @@ import EssentialFeediOS
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   var window: UIWindow?
+
+  // background concurrent scheduler
+  private lazy var scheduler: AnyDispatchQueueScheduler = DispatchQueue(
+    label: "com.ak.sfod.EssentialFeed.queue",
+    qos:  .userInitiated,
+    attributes: .concurrent
+  ).eraseToAnyScheduler()
   
   private lazy var httpClient: HTTPClient = {
     URLSessionHTTPClient(session: URLSession(configuration: .ephemeral))
@@ -51,10 +58,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       imageLoader: makeLocalImageLoaderWithRemoteFallback,
       selection: showComments))
 
-  convenience init(httpClient: HTTPClient, store: FeedStore & FeedImageDataStore) {
+  convenience init(httpClient: HTTPClient, store: FeedStore & FeedImageDataStore, scheduler: AnyDispatchQueueScheduler) {
     self.init()
     self.httpClient = httpClient
     self.store = store
+    self.scheduler = scheduler
   }
 
   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
@@ -178,19 +186,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     return localImageLoader
       .loadImageDataPublisher(from: url)
-      .logCacheMisses(url: url, logger: logger)
+//      .logCacheMisses(url: url, logger: logger)
 //      .fallback(to: { [logger] in // 4
-      .fallback(to: { [httpClient, logger] in
+      .fallback(to: { [httpClient/*, logger*/, scheduler] in
         // 4. we can use 'logger' into 'Publishers' chain with '.handleEvents' and we dont need to decorate the client anymore
 //        var startTime = CACurrentMediaTime() // 4
 
         httpClient
           .getPublisher(url: url)
-          .logErrors(url: url, logger: logger)
-          .logElapsedTime(url: url, logger: logger)
+//          .logErrors(url: url, logger: logger)
+//          .logElapsedTime(url: url, logger: logger)
           .tryMap(FeedImageDataMapper.map)
           .caching(to: localImageLoader, using: url)
+          .subscribe(on: scheduler)
+          .eraseToAnyPublisher()
       })
+    // 'subscribe(on)' 'publisher' allows us to execute work in any provided 'scheduler', in this case 'DispatchQueue.global()' which is concurrent queue ('concurrent' - it will choose whatever thread is idle and run the operation concurrently)
+    // if our component is not thread safe we need to always execute operations in a serial 'scheduler' or 'queue' (like created in the beginning of file)
+    // 'subscribe(on)' is affecting everything what is executed above it - 'upstream'. but the 'results' when its done will be 'dispatched' with 'DispatchQueue.main'
+      .subscribe(on: scheduler)
+      .eraseToAnyPublisher()
   }
 }
 

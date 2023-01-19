@@ -36,6 +36,18 @@ public final class CoreDataFeedStore {
     context.perform { [context] in action(context) }
   }
 
+  // sync API does not need to be escaping! because sync API execute synchronously and when it returns it does not hold any reference to the closure
+  // generic <R> Result type to be able return depends on what we need
+  // our 'action 'closure can also return 'Result' and if it fails it should throw an error
+  func performSync<R>(_ action: (NSManagedObjectContext) -> Result<R, Error>) throws -> R {
+    let context = self.context
+    var result: Result<R, Error>!
+    // it will lock the client here until the action is completed
+    context.performAndWait { result = action(context) }
+    // here  we return either the result or if it throws we throw an error
+    return try result.get()
+  }
+
   private func cleanUpReferencesToPersistentStores() {
     context.performAndWait {
       let coordinator = self.container.persistentStoreCoordinator

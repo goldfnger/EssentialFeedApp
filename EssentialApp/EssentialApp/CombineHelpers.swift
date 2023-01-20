@@ -141,7 +141,7 @@ private extension FeedCache {
   // we dont care about result
   // to cache 'FeedImage' items
   func saveIgnoringResult(_ feed: [FeedImage]) {
-    save(feed) { _ in }
+    try? save(feed)
   }
 
   // to cache 'Paginated' 'FeedImage' ie 'pages'

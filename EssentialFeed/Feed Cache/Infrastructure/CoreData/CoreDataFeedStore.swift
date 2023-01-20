@@ -32,10 +32,6 @@ public final class CoreDataFeedStore {
     }
   }
 
-  func performAsync(_ action: @escaping (NSManagedObjectContext) -> Void) {
-    context.perform { [context] in action(context) }
-  }
-
   // sync API does not need to be escaping! because sync API execute synchronously and when it returns it does not hold any reference to the closure
   // generic <R> Result type to be able return depends on what we need
   // our 'action 'closure can also return 'Result' and if it fails it should throw an error

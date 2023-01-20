@@ -111,6 +111,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       .caching(to: localFeedLoader) // [     caching     ]
       .fallback(to: localFeedLoader.loadPublisher)
       .map(makeFirstPage)
+      .subscribe(on: scheduler)
       .eraseToAnyPublisher()
   }
 
@@ -143,14 +144,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // and keep appending all the elements until 'newItems' is empty which means we reached the end of the pagination
         // 6) and we can combine 'cachedItems' with 'newItems'
         (cachedItems + newItems, newItems.last)
-        // then makes a page
-      }.map(makePage)
+      }
+    // then makes a page
+      .map(makePage)
     // only for testing purpose
       /*.delay(for: 2, scheduler: DispatchQueue.main)*/ // thats how we can test and make sure in builded app that spinner is shown when new page is loading
       /*.flatMap({ _ in
         Fail(error: NSError())
       })*/ // thats how we can test and make sure that error appears if loading is failed
       .caching(to: localFeedLoader)
+      .subscribe(on: scheduler)
+      .eraseToAnyPublisher()
   }
 
   // we need to call this method recursively
